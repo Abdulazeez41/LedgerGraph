@@ -1,112 +1,408 @@
-/* LedgerGraph Custom Styles */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+/* ==========================================================================
+   LedgerGraph — Apple-Grade Glassmorphism & Framer Motion Theme
+   Color Palette: Deep Sea-Green & Warm Cream Mixture
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  /* Sea-Green Palette */
+  --sg-abyss: #04100e;
+  --sg-base: #061815;
+  --sg-card: rgba(8, 28, 24, 0.68);
+  --sg-card-elevated: rgba(12, 38, 33, 0.78);
+  --sg-card-hover: rgba(16, 49, 43, 0.82);
+  --sg-surface: rgba(19, 58, 51, 0.5);
+  
+  --sg-border: rgba(45, 212, 191, 0.16);
+  --sg-border-highlight: rgba(45, 212, 191, 0.32);
+  --sg-border-active: rgba(94, 234, 212, 0.5);
+  
+  --sg-glow: rgba(20, 184, 166, 0.28);
+  --sg-primary: #14b8a6;
+  --sg-primary-bright: #2dd4bf;
+  --sg-emerald: #10b981;
+  --sg-mint: #5eead4;
+  
+  /* Warm Cream Palette */
+  --cream-pure: #ffffff;
+  --cream-50: #fdfbf7;
+  --cream-100: #fbf7ee;
+  --cream-200: #f5efe1;
+  --cream-300: #eadeca;
+  --cream-400: #cfbea3;
+  --cream-500: #a89475;
+  --cream-glow: rgba(253, 247, 238, 0.09);
+  --cream-border: rgba(251, 247, 238, 0.14);
+  
+  /* Apple Easing Curves */
+  --spring-apple: cubic-bezier(0.16, 1, 0.3, 1);
+  --spring-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* --------------------------------------------------------------------------
+   Base HTML & Background Aurora Setup
+   -------------------------------------------------------------------------- */
+html {
+  scroll-behavior: smooth;
+  background-color: var(--sg-abyss);
+}
 
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    background-color: #0B0F17;
-    color: #E2E8F0;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif;
+  background-color: var(--sg-abyss);
+  color: var(--cream-100);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-code, pre, .font-mono {
-    font-family: 'JetBrains Mono', monospace;
+/* Dynamic Aurora Ambient Glows (Apple Keynote / Framer Motion Depth) */
+.ambient-aurora {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
 }
 
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-}
-::-webkit-scrollbar-track {
-    background: #0F172A;
-}
-::-webkit-scrollbar-thumb {
-    background: #334155;
-    border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-    background: #475569;
+.aurora-blob {
+  position: absolute;
+  filter: blur(100px);
+  border-radius: 50%;
+  opacity: 0.65;
+  will-change: transform;
 }
 
-/* Graph Canvas Container */
-#graph-canvas {
-    width: 100%;
-    height: 380px;
-    background: radial-gradient(circle at center, #131D31 0%, #0B0F17 100%);
-    border-radius: 0.75rem;
-    position: relative;
-    overflow: hidden;
+.aurora-1 {
+  width: 650px;
+  height: 650px;
+  top: -150px;
+  left: 10%;
+  background: radial-gradient(circle, rgba(20, 184, 166, 0.22) 0%, rgba(13, 148, 136, 0.12) 50%, transparent 70%);
+  animation: aurora-float-1 22s ease-in-out infinite alternate;
 }
 
-/* Pulse animation for live badge */
-@keyframes pulse-ring {
-    0% { transform: scale(0.95); opacity: 0.8; }
-    50% { transform: scale(1.15); opacity: 0.3; }
-    100% { transform: scale(0.95); opacity: 0.8; }
+.aurora-2 {
+  width: 550px;
+  height: 550px;
+  top: 15%;
+  right: -80px;
+  background: radial-gradient(circle, rgba(253, 247, 238, 0.11) 0%, rgba(45, 212, 191, 0.1) 45%, transparent 70%);
+  animation: aurora-float-2 26s ease-in-out infinite alternate;
 }
 
-.pulse-dot {
-    position: relative;
-}
-.pulse-dot::before {
-    content: '';
-    position: absolute;
-    top: -2px;
-    left: -2px;
-    right: -2px;
-    bottom: -2px;
-    border-radius: 50%;
-    background-color: #10B981;
-    animation: pulse-ring 2s infinite ease-in-out;
+.aurora-3 {
+  width: 750px;
+  height: 750px;
+  bottom: -200px;
+  left: 25%;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.16) 0%, rgba(6, 78, 59, 0.1) 50%, transparent 70%);
+  animation: aurora-float-3 28s ease-in-out infinite alternate;
 }
 
-/* Glassmorphism utility */
+/* Subtle micro-grid texture for tactile Apple glass sensation */
+.bg-subtle-grid {
+  background-image: 
+    linear-gradient(to right, rgba(45, 212, 191, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(45, 212, 191, 0.03) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* --------------------------------------------------------------------------
+   Apple-Grade Glassmorphism Components
+   -------------------------------------------------------------------------- */
 .glass-panel {
-    background: rgba(15, 23, 42, 0.75);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(51, 65, 85, 0.6);
+  background: var(--sg-card);
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  border: 1px solid var(--sg-border);
+  box-shadow: 
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.1),
+    0 12px 36px -12px rgba(2, 16, 13, 0.65),
+    0 1px 3px 0 rgba(0, 0, 0, 0.3);
+  transition: all 0.35s var(--spring-apple);
+}
+
+.glass-panel:hover {
+  border-color: var(--sg-border-highlight);
+  box-shadow: 
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.16),
+    0 20px 48px -14px rgba(2, 16, 13, 0.8),
+    0 0 24px -4px var(--sg-glow);
 }
 
 .glass-panel-elevated {
-    background: rgba(30, 41, 59, 0.7);
-    backdrop-filter: blur(16px);
-    border: 1px solid rgba(71, 85, 105, 0.4);
+  background: var(--sg-card-elevated);
+  backdrop-filter: blur(36px) saturate(200%);
+  -webkit-backdrop-filter: blur(36px) saturate(200%);
+  border: 1px solid rgba(251, 247, 238, 0.18);
+  box-shadow: 
+    inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.18),
+    0 24px 60px -16px rgba(0, 0, 0, 0.85),
+    0 0 32px -4px rgba(45, 212, 191, 0.2);
 }
 
-/* Badges for recommendations */
+/* Apple Pill Navigation & Controls */
+.glass-pill {
+  background: rgba(14, 43, 38, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--cream-border);
+  color: var(--cream-200);
+  transition: all 0.25s var(--spring-apple);
+}
+
+.glass-pill:hover {
+  background: rgba(22, 62, 55, 0.85);
+  border-color: rgba(94, 234, 212, 0.45);
+  color: var(--cream-50);
+  transform: translateY(-1.5px);
+  box-shadow: 0 6px 18px -4px rgba(20, 184, 166, 0.25);
+}
+
+.glass-pill:active {
+  transform: translateY(0.5px) scale(0.98);
+}
+
+/* Primary Sea-Green Action Button */
+.btn-apple-primary {
+  background: linear-gradient(135deg, #0d9488 0%, #10b981 100%);
+  color: #ffffff;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.35),
+    0 8px 24px -6px rgba(16, 185, 129, 0.45);
+  transition: all 0.25s var(--spring-apple);
+}
+
+.btn-apple-primary:hover {
+  background: linear-gradient(135deg, #14b8a6 0%, #34d399 100%);
+  box-shadow: 
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.45),
+    0 12px 28px -6px rgba(45, 212, 191, 0.6);
+  transform: translateY(-1px) scale(1.01);
+}
+
+.btn-apple-primary:active {
+  transform: translateY(1px) scale(0.97);
+}
+
+/* Cream Mixture Accent Button */
+.btn-apple-cream {
+  background: rgba(251, 247, 238, 0.1);
+  color: var(--cream-100);
+  border: 1px solid rgba(251, 247, 238, 0.25);
+  backdrop-filter: blur(12px);
+  transition: all 0.25s var(--spring-apple);
+}
+
+.btn-apple-cream:hover {
+  background: rgba(251, 247, 238, 0.18);
+  border-color: rgba(251, 247, 238, 0.45);
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px -4px rgba(253, 247, 238, 0.18);
+}
+
+/* Glass Inputs */
+.glass-input {
+  background: rgba(5, 20, 17, 0.75);
+  border: 1px solid var(--sg-border);
+  color: var(--cream-50);
+  transition: all 0.25s var(--spring-apple);
+}
+
+.glass-input:focus {
+  outline: none;
+  background: rgba(7, 26, 22, 0.9);
+  border-color: var(--sg-primary-bright);
+  box-shadow: 
+    0 0 0 3px rgba(45, 212, 191, 0.22),
+    inset 0 1px 1px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* --------------------------------------------------------------------------
+   Graph Canvas Container (Vis.js Network)
+   -------------------------------------------------------------------------- */
+#graph-canvas {
+  width: 100%;
+  height: 385px;
+  background: radial-gradient(ellipse at 50% 50%, #082823 0%, #041411 100%);
+  border-radius: 1.25rem;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(45, 212, 191, 0.18);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+/* Canvas Glass Shimmer Overlay */
+.canvas-rim-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: 1.25rem;
+  box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+/* --------------------------------------------------------------------------
+   Recommendation Badges (Refined Apple Glass Style)
+   -------------------------------------------------------------------------- */
 .badge-approve {
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.3) 100%);
-    border: 1px solid rgba(16, 185, 129, 0.6);
-    color: #34D399;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.18) 0%, rgba(5, 150, 105, 0.32) 100%);
+  border: 1px solid rgba(52, 211, 153, 0.55);
+  color: #6ee7b7;
+  box-shadow: 0 4px 16px -2px rgba(16, 185, 129, 0.25);
 }
 
 .badge-conditions {
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(217, 119, 6, 0.3) 100%);
-    border: 1px solid rgba(245, 158, 11, 0.6);
-    color: #FBBF24;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.18) 0%, rgba(217, 119, 6, 0.32) 100%);
+  border: 1px solid rgba(251, 191, 36, 0.55);
+  color: #fde68a;
+  box-shadow: 0 4px 16px -2px rgba(245, 158, 11, 0.25);
 }
 
 .badge-hold {
-    background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(185, 28, 28, 0.3) 100%);
-    border: 1px solid rgba(239, 68, 68, 0.6);
-    color: #F87171;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.18) 0%, rgba(185, 28, 28, 0.32) 100%);
+  border: 1px solid rgba(248, 113, 113, 0.55);
+  color: #fca5a5;
+  box-shadow: 0 4px 16px -2px rgba(239, 68, 68, 0.25);
 }
 
 .badge-escalate {
-    background: linear-gradient(135deg, rgba(168, 85, 247, 0.25) 0%, rgba(126, 34, 206, 0.35) 100%);
-    border: 1px solid rgba(168, 85, 247, 0.6);
-    color: #C084FC;
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.22) 0%, rgba(126, 34, 206, 0.36) 100%);
+  border: 1px solid rgba(192, 132, 252, 0.55);
+  color: #e9d5ff;
+  box-shadow: 0 4px 18px -2px rgba(168, 85, 247, 0.3);
 }
 
 .badge-chase {
-    background: linear-gradient(135deg, rgba(249, 115, 22, 0.2) 0%, rgba(194, 65, 12, 0.3) 100%);
-    border: 1px solid rgba(249, 115, 22, 0.6);
-    color: #FB923C;
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.2) 0%, rgba(194, 65, 12, 0.32) 100%);
+  border: 1px solid rgba(251, 146, 60, 0.55);
+  color: #fed7aa;
+  box-shadow: 0 4px 16px -2px rgba(249, 115, 22, 0.25);
 }
 
-/* Modal animation */
-.modal-overlay {
-    transition: opacity 0.2s ease-in-out;
+/* --------------------------------------------------------------------------
+   Framer Motion-Inspired Animation Utilities
+   -------------------------------------------------------------------------- */
+@keyframes framer-entry {
+  0% {
+    opacity: 0;
+    transform: translateY(18px) scale(0.985);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
-.modal-content {
-    transition: transform 0.2s ease-out;
+
+.animate-framer-in {
+  animation: framer-entry 0.65s var(--spring-apple) forwards;
+}
+
+/* Stagger delays */
+.stagger-1 { animation-delay: 0.06s; }
+.stagger-2 { animation-delay: 0.12s; }
+.stagger-3 { animation-delay: 0.18s; }
+.stagger-4 { animation-delay: 0.24s; }
+.stagger-5 { animation-delay: 0.30s; }
+
+/* Aurora Float Keyframes */
+@keyframes aurora-float-1 {
+  0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+  50% { transform: translate(80px, 60px) scale(1.12) rotate(45deg); }
+  100% { transform: translate(-40px, 90px) scale(0.95) rotate(90deg); }
+}
+
+@keyframes aurora-float-2 {
+  0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+  50% { transform: translate(-90px, 80px) scale(1.08) rotate(-35deg); }
+  100% { transform: translate(50px, -40px) scale(0.92) rotate(60deg); }
+}
+
+@keyframes aurora-float-3 {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(60px, -70px) scale(1.1); }
+  100% { transform: translate(-50px, 30px) scale(0.96); }
+}
+
+/* Pulsing Agent Indicator */
+@keyframes sea-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(45, 212, 191, 0.6); }
+  70% { box-shadow: 0 0 0 10px rgba(45, 212, 191, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(45, 212, 191, 0); }
+}
+
+.pulse-dot-sea {
+  position: relative;
+  display: inline-block;
+  border-radius: 50%;
+  animation: sea-pulse 2.2s infinite var(--spring-apple);
+}
+
+/* Glass Shimmer on Update */
+@keyframes glass-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.shimmer-active {
+  background: linear-gradient(
+    90deg, 
+    rgba(255, 255, 255, 0) 0%, 
+    rgba(45, 212, 191, 0.12) 50%, 
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-size: 200% 100%;
+  animation: glass-shimmer 1.8s infinite;
+}
+
+/* Segmented Tab Slider */
+.tab-pill-active {
+  background: rgba(45, 212, 191, 0.18) !important;
+  color: var(--cream-50) !important;
+  border-bottom: 2px solid var(--sg-primary-bright) !important;
+  box-shadow: 0 4px 16px -4px rgba(20, 184, 166, 0.35);
+}
+
+/* Modal Spring In */
+@keyframes modal-spring {
+  0% {
+    opacity: 0;
+    transform: scale(0.93) translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-modal-spring {
+  animation: modal-spring 0.35s var(--spring-apple) forwards;
+}
+
+/* Custom Scrollbar for Sea-Green Glass Theme */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(4, 16, 14, 0.4);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(45, 212, 191, 0.25);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(45, 212, 191, 0.45);
+}
+
+/* Monospace Code Styling */
+code, pre, .font-mono {
+  font-family: 'JetBrains Mono', monospace;
 }

@@ -11,20 +11,20 @@ let appState = {
     activeTab: 'evidence'
 };
 
-// Node visual theme configuration
+// Node visual theme configuration (Sea-Green & Cream Apple Palette)
 const NODE_COLORS = {
-    Customer: { background: '#2563EB', border: '#1D4ED8', font: '#FFFFFF' },
-    DelinquentCustomer: { background: '#DC2626', border: '#991B1B', font: '#FFFFFF' },
-    Order: { background: '#0284C7', border: '#0369A1', font: '#FFFFFF' },
-    Invoice: { background: '#D97706', border: '#B45309', font: '#FFFFFF' },
-    OverdueInvoice: { background: '#EA580C', border: '#C2410C', font: '#FFFFFF' },
-    Payment: { background: '#059669', border: '#047857', font: '#FFFFFF' },
-    Dispute: { background: '#E11D48', border: '#BE123C', font: '#FFFFFF' },
-    Supplier: { background: '#7C3AED', border: '#6D28D9', font: '#FFFFFF' },
-    Product: { background: '#0D9488', border: '#0F766E', font: '#FFFFFF' },
-    AgentDecision: { background: '#4F46E5', border: '#4338CA', font: '#FFFFFF' },
-    AgentMemory: { background: '#9333EA', border: '#7E22CE', font: '#FFFFFF' },
-    AgentTask: { background: '#CA8A04', border: '#A16207', font: '#FFFFFF' }
+    Customer: { background: '#14b8a6', border: '#0d9488', font: '#fdfbf7' },
+    DelinquentCustomer: { background: '#f43f5e', border: '#be123c', font: '#ffffff' },
+    Order: { background: '#0284c7', border: '#0369a1', font: '#fdfbf7' },
+    Invoice: { background: '#d97706', border: '#b45309', font: '#fdfbf7' },
+    OverdueInvoice: { background: '#ea580c', border: '#c2410c', font: '#ffffff' },
+    Payment: { background: '#10b981', border: '#047857', font: '#fdfbf7' },
+    Dispute: { background: '#e11d48', border: '#9f1239', font: '#ffffff' },
+    Supplier: { background: '#8b5cf6', border: '#7c3aed', font: '#fdfbf7' },
+    Product: { background: '#2dd4bf', border: '#0f766e', font: '#04100e' },
+    AgentDecision: { background: '#3b82f6', border: '#2563eb', font: '#ffffff' },
+    AgentMemory: { background: '#a855f7', border: '#9333ea', font: '#ffffff' },
+    AgentTask: { background: '#eab308', border: '#ca8a04', font: '#04100e' }
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -51,14 +51,14 @@ function initGraphNetwork() {
         nodes: {
             shape: 'dot',
             size: 16,
-            font: { size: 11, color: '#E2E8F0', face: 'Inter' },
+            font: { size: 11, color: '#fbf7ee', face: 'Plus Jakarta Sans, sans-serif' },
             borderWidth: 2,
-            shadow: true
+            shadow: { enabled: true, color: 'rgba(0,0,0,0.6)', size: 8 }
         },
         edges: {
             width: 1.5,
-            color: { color: '#475569', highlight: '#38BDF8', hover: '#94A3B8' },
-            font: { size: 9, color: '#94A3B8', align: 'horizontal', face: 'JetBrains Mono' },
+            color: { color: '#11443c', highlight: '#2dd4bf', hover: '#5eead4' },
+            font: { size: 9, color: '#cfbea3', align: 'horizontal', face: 'JetBrains Mono' },
             arrows: { to: { enabled: true, scaleFactor: 0.6 } },
             smooth: { type: 'continuous' }
         },
@@ -216,30 +216,30 @@ function appendChatMessage(sender, text, amount = 0, rec = null, conf = null) {
     const msgDiv = document.createElement('div');
 
     if (sender === 'user') {
-        msgDiv.className = 'p-3 rounded-lg bg-blue-900/30 border border-blue-800/50 text-slate-200 ml-4 space-y-1';
+        msgDiv.className = 'p-3.5 rounded-2xl bg-teal-950/40 border border-teal-500/25 text-cream-100 ml-4 space-y-1.5 shadow-sm backdrop-blur-md animate-framer-in';
         msgDiv.innerHTML = `
-            <div class="flex items-center justify-between text-[11px] text-blue-300 font-medium">
-                <span class="flex items-center gap-1"><i data-lucide="user" class="w-3 h-3"></i> You</span>
-                ${amount > 0 ? `<span class="font-mono bg-blue-950 px-1.5 py-0.5 rounded border border-blue-800">Order: $${amount.toLocaleString()}</span>` : ''}
+            <div class="flex items-center justify-between text-[11px] text-teal-300 font-medium">
+                <span class="flex items-center gap-1.5"><i data-lucide="user" class="w-3.5 h-3.5 text-teal-400"></i> You</span>
+                ${amount > 0 ? `<span class="font-mono bg-teal-900/60 px-2 py-0.5 rounded-full border border-teal-500/30 text-cream-50 text-[10px]">Order: $${amount.toLocaleString()}</span>` : ''}
             </div>
-            <div class="leading-relaxed">${escapeHtml(text)}</div>
+            <div class="leading-relaxed text-cream-100 text-xs">${escapeHtml(text)}</div>
         `;
     } else {
-        msgDiv.className = 'p-3 rounded-lg bg-slate-900/80 border border-slate-800 text-slate-200 space-y-2';
+        msgDiv.className = 'p-3.5 rounded-2xl bg-[#08221d]/85 border border-teal-500/25 text-cream-100 space-y-2 shadow-md backdrop-blur-md animate-framer-in';
         let recBadge = '';
         if (rec) {
             const badgeClass = getRecommendationClass(rec);
-            recBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold ${badgeClass}">${rec}</span>`;
+            recBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ${badgeClass}">${rec}</span>`;
         }
 
         // Format markdown bolding & bullets
         const formattedText = formatMarkdown(text);
         msgDiv.innerHTML = `
-            <div class="flex items-center justify-between text-[11px] text-slate-400">
-                <span class="flex items-center gap-1 text-blue-400 font-semibold"><i data-lucide="sparkles" class="w-3 h-3"></i> LedgerGraph Copilot</span>
+            <div class="flex items-center justify-between text-[11px] text-cream-400/80">
+                <span class="flex items-center gap-1.5 text-teal-300 font-semibold"><i data-lucide="sparkles" class="w-3.5 h-3.5 text-teal-400"></i> LedgerGraph Copilot</span>
                 ${recBadge}
             </div>
-            <div class="leading-relaxed space-y-1.5 text-slate-300">${formattedText}</div>
+            <div class="leading-relaxed space-y-1.5 text-cream-200 text-xs">${formattedText}</div>
         `;
     }
 
@@ -398,7 +398,7 @@ function renderEvidenceProfile(p) {
 function renderConnectedRisk(risks) {
     const container = document.getElementById('connected-risk-content');
     if (!risks || risks.length === 0) {
-        container.innerHTML = '<div class="p-2.5 rounded bg-slate-900/60 border border-slate-800 text-slate-500">No contact-sharing risk detected for this customer.</div>';
+        container.innerHTML = '<div class="p-3 rounded-xl bg-[#08221d]/50 border border-teal-500/15 text-cream-400/70">No contact-sharing risk detected for this customer.</div>';
         return;
     }
 
@@ -410,25 +410,27 @@ function renderConnectedRisk(risks) {
         const sharedStr = shared.join(', ') || 'Contact Details';
 
         const hasOverdue = (r.overdue_amount || 0) > 0;
-        const borderClass = hasOverdue ? 'border-rose-800/80 bg-rose-950/20' : 'border-slate-800 bg-slate-900/60';
+        const borderClass = hasOverdue ? 'border-rose-500/40 bg-rose-950/25' : 'border-teal-500/20 bg-[#08221d]/60';
 
         return `
-            <div class="p-3 rounded-lg border ${borderClass} space-y-1">
+            <div class="p-3.5 rounded-xl border ${borderClass} space-y-1.5 backdrop-blur-sm shadow-sm">
                 <div class="flex items-center justify-between">
-                    <span class="font-bold text-slate-200">Shared Link: ${escapeHtml(r.connected_customer)}</span>
-                    <span class="text-[10px] px-2 py-0.5 rounded bg-rose-900/50 text-rose-300 font-mono">Risk: ${r.connected_risk_score}/100</span>
+                    <span class="font-bold text-cream-50 text-xs">Shared Entity: ${escapeHtml(r.connected_customer)}</span>
+                    <span class="text-[10px] px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 font-mono border border-rose-500/30">Risk: ${r.connected_risk_score}/100</span>
                 </div>
-                <div class="text-[11px] text-slate-400">
-                    Shared Attribute: <strong class="text-rose-400">${sharedStr}</strong>
+                <div class="text-[11px] text-cream-300">
+                    Shared Contact Link: <strong class="text-rose-400 font-semibold">${sharedStr}</strong>
                 </div>
                 ${hasOverdue ? `
-                    <div class="text-[11px] text-rose-300 font-semibold">
-                        ⚠️ Connected Overdue Debt: $${(r.overdue_amount).toLocaleString()} across ${r.overdue_invoices_count} overdue invoice(s)!
+                    <div class="text-[11px] text-rose-300 font-semibold flex items-center gap-1.5 pt-0.5">
+                        <i data-lucide="alert-octagon" class="w-3.5 h-3.5 text-rose-400 shrink-0"></i>
+                        <span>Connected Delinquent Debt: $${(r.overdue_amount).toLocaleString()} across ${r.overdue_invoices_count} overdue invoice(s)!</span>
                     </div>
-                ` : `<div class="text-[11px] text-emerald-400">No overdue debt on connected entity.</div>`}
+                ` : `<div class="text-[11px] text-teal-300 font-medium">No overdue debt on connected entity.</div>`}
             </div>
         `;
     }).join('');
+    lucide.createIcons();
 }
 
 // Load Invoices and Disputes for Customer
@@ -440,34 +442,34 @@ async function loadInvoicesHistory(customerName) {
         const tbody = document.getElementById('invoices-tbody');
 
         if (rows.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" class="p-3 text-center text-slate-500">No invoice records found.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-cream-400/60">No invoice records found.</td></tr>';
             return;
         }
 
         tbody.innerHTML = rows.map(r => {
-            let statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] bg-slate-800 text-slate-300">PENDING</span>';
+            let statusBadge = '<span class="px-2 py-0.5 rounded-md text-[10px] bg-[#061815] text-cream-300 border border-teal-500/20">PENDING</span>';
             if (r.invoice_status === 'PAID') {
-                statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] bg-emerald-950/80 text-emerald-400 border border-emerald-800">PAID</span>';
+                statusBadge = '<span class="px-2 py-0.5 rounded-md text-[10px] bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-semibold">PAID</span>';
             } else if (r.invoice_status === 'OVERDUE') {
-                statusBadge = `<span class="px-2 py-0.5 rounded text-[10px] bg-rose-950/80 text-rose-400 border border-rose-800 font-bold">OVERDUE (${r.days_overdue}d)</span>`;
+                statusBadge = `<span class="px-2 py-0.5 rounded-md text-[10px] bg-rose-500/20 text-rose-300 border border-rose-500/40 font-bold">OVERDUE (${r.days_overdue}d)</span>`;
             } else if (r.invoice_status === 'PARTIALLY_PAID') {
-                statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] bg-amber-950/80 text-amber-400 border border-amber-800">PARTIAL</span>';
+                statusBadge = '<span class="px-2 py-0.5 rounded-md text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/40 font-semibold">PARTIAL</span>';
             }
 
             const disputeBadge = r.dispute_reason 
                 ? `<span class="text-rose-400 font-medium">⚠️ ${escapeHtml(r.dispute_reason)} [${r.dispute_severity || 'MED'}]</span>`
-                : '<span class="text-slate-500">None</span>';
+                : '<span class="text-cream-400/50">None</span>';
 
             const paidAmount = r.paid_amount ? `$${Number(r.paid_amount).toLocaleString()}` : '$0.00';
 
             return `
-                <tr class="hover:bg-slate-900/60 transition">
-                    <td class="p-2 font-mono text-slate-200">${escapeHtml(r.invoice_number)}</td>
-                    <td class="p-2 font-mono font-medium">$${Number(r.invoice_amount).toLocaleString()}</td>
-                    <td class="p-2 text-slate-400">${escapeHtml(r.due_date || '')}</td>
-                    <td class="p-2">${statusBadge}</td>
-                    <td class="p-2 font-mono text-emerald-400">${paidAmount}</td>
-                    <td class="p-2">${disputeBadge}</td>
+                <tr class="hover:bg-teal-950/30 transition-colors">
+                    <td class="p-2.5 font-mono text-cream-100">${escapeHtml(r.invoice_number)}</td>
+                    <td class="p-2.5 font-mono font-semibold text-cream-50">$${Number(r.invoice_amount).toLocaleString()}</td>
+                    <td class="p-2.5 text-cream-400">${escapeHtml(r.due_date || '')}</td>
+                    <td class="p-2.5">${statusBadge}</td>
+                    <td class="p-2.5 font-mono text-emerald-400">${paidAmount}</td>
+                    <td class="p-2.5">${disputeBadge}</td>
                 </tr>
             `;
         }).join('');
@@ -487,17 +489,17 @@ async function loadDecisionsAndMemories(customerName) {
         const memories = data.memories || [];
         if (memories.length > 0) {
             memList.innerHTML = memories.map(m => `
-                <div class="p-2.5 rounded bg-purple-950/20 border border-purple-900/40 space-y-1">
+                <div class="p-3 rounded-xl bg-purple-950/25 border border-purple-800/30 space-y-1.5 backdrop-blur-sm shadow-sm">
                     <div class="flex items-center justify-between text-[11px]">
-                        <span class="font-bold text-purple-300">[${escapeHtml(m.memory_type)}]</span>
-                        <span class="text-[10px] text-purple-400 font-mono">Importance: ${m.importance}/10</span>
+                        <span class="font-bold text-purple-200">[${escapeHtml(m.memory_type)}]</span>
+                        <span class="text-[10px] text-purple-300 font-mono px-2 py-0.5 rounded bg-purple-900/40 border border-purple-700/40">Importance: ${m.importance}/10</span>
                     </div>
-                    <p class="text-slate-300 text-xs">${escapeHtml(m.content)}</p>
-                    <div class="text-[10px] text-slate-500">${escapeHtml(m.created_at || '')}</div>
+                    <p class="text-cream-100 text-xs leading-relaxed">${escapeHtml(m.content)}</p>
+                    <div class="text-[10px] text-cream-400/70">${escapeHtml(m.created_at || '')}</div>
                 </div>
             `).join('');
         } else {
-            memList.innerHTML = '<div class="p-2.5 rounded bg-slate-900/60 border border-slate-800 text-slate-500">No memories recorded for this customer.</div>';
+            memList.innerHTML = '<div class="p-3 rounded-xl bg-[#08221d]/50 border border-teal-500/15 text-cream-400/70">No memories recorded for this customer.</div>';
         }
 
         // 2. Decisions
@@ -505,18 +507,18 @@ async function loadDecisionsAndMemories(customerName) {
         const decisions = data.decisions || [];
         if (decisions.length > 0) {
             decList.innerHTML = decisions.map(d => `
-                <div class="p-3 rounded-lg bg-slate-900/70 border border-slate-800 space-y-1.5">
+                <div class="p-3.5 rounded-xl bg-[#08221d]/75 border border-teal-500/20 space-y-2 backdrop-blur-sm shadow-sm">
                     <div class="flex items-center justify-between">
-                        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${getRecommendationClass(d.recommendation)}">${d.recommendation}</span>
-                        <span class="text-[10px] text-slate-500 font-mono">${escapeHtml(d.created_at || '')}</span>
+                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ${getRecommendationClass(d.recommendation)}">${d.recommendation}</span>
+                        <span class="text-[10px] text-cream-400 font-mono">${escapeHtml(d.created_at || '')}</span>
                     </div>
-                    <div class="text-slate-300 font-medium text-xs">"${escapeHtml(d.question)}"</div>
-                    <div class="text-slate-400 text-[11px] leading-relaxed">${escapeHtml(d.rationale)}</div>
-                    ${d.user_feedback ? `<div class="text-[11px] text-amber-300 bg-amber-950/30 p-1.5 rounded border border-amber-900/40">Owner Feedback: ${escapeHtml(d.user_feedback)}</div>` : ''}
+                    <div class="text-cream-50 font-semibold text-xs">"${escapeHtml(d.question)}"</div>
+                    <div class="text-cream-300 text-[11px] leading-relaxed">${escapeHtml(d.rationale)}</div>
+                    ${d.user_feedback ? `<div class="text-[11px] text-amber-200 bg-amber-950/40 p-2 rounded-lg border border-amber-800/40">Owner Feedback: ${escapeHtml(d.user_feedback)}</div>` : ''}
                 </div>
             `).join('');
         } else {
-            decList.innerHTML = '<div class="p-2.5 rounded bg-slate-900/60 border border-slate-800 text-slate-500">No previous decisions recorded yet.</div>';
+            decList.innerHTML = '<div class="p-3 rounded-xl bg-[#08221d]/50 border border-teal-500/15 text-cream-400/70">No previous decisions recorded yet.</div>';
         }
 
         // 3. Tasks
@@ -524,17 +526,17 @@ async function loadDecisionsAndMemories(customerName) {
         const tasks = data.tasks || [];
         if (tasks.length > 0) {
             taskList.innerHTML = tasks.map(t => `
-                <div class="p-2.5 rounded bg-slate-900/70 border border-slate-800 space-y-1">
+                <div class="p-3 rounded-xl bg-[#08221d]/75 border border-teal-500/20 space-y-1.5 backdrop-blur-sm shadow-sm">
                     <div class="flex items-center justify-between">
-                        <span class="font-bold text-slate-200">${escapeHtml(t.title)}</span>
-                        <span class="px-2 py-0.5 rounded text-[10px] bg-amber-950 text-amber-400 border border-amber-800">${escapeHtml(t.status)}</span>
+                        <span class="font-bold text-cream-50 text-xs">${escapeHtml(t.title)}</span>
+                        <span class="px-2 py-0.5 rounded-md text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/40 font-semibold">${escapeHtml(t.status)}</span>
                     </div>
-                    <p class="text-slate-400 text-xs">${escapeHtml(t.description)}</p>
-                    <div class="text-[10px] text-slate-500">Due Date: ${escapeHtml(t.due_date || 'N/A')}</div>
+                    <p class="text-cream-300 text-xs leading-relaxed">${escapeHtml(t.description)}</p>
+                    <div class="text-[10px] text-cream-400 font-mono">Due Date: ${escapeHtml(t.due_date || 'N/A')}</div>
                 </div>
             `).join('');
         } else {
-            taskList.innerHTML = '<div class="p-2.5 rounded bg-slate-900/60 border border-slate-800 text-slate-500">No active follow-up tasks.</div>';
+            taskList.innerHTML = '<div class="p-3 rounded-xl bg-[#08221d]/50 border border-teal-500/15 text-cream-400/70">No active follow-up tasks.</div>';
         }
     } catch (e) {
         console.error('Error loading decisions and memories:', e);
@@ -547,21 +549,21 @@ function renderCypherQueries(queries) {
     document.getElementById('cypher-count-badge').innerText = queries.length;
 
     if (!queries || queries.length === 0) {
-        container.innerHTML = '<div class="p-3 rounded-lg bg-slate-900/60 border border-slate-800 text-slate-500 text-center">No Cypher queries recorded for this action.</div>';
+        container.innerHTML = '<div class="p-4 rounded-xl bg-[#08221d]/50 border border-teal-500/15 text-cream-400/70 text-center">No Cypher queries recorded for this action.</div>';
         return;
     }
 
     container.innerHTML = queries.map((q, idx) => `
-        <div class="rounded-lg border border-slate-800 bg-slate-950/80 overflow-hidden space-y-1">
-            <div class="flex items-center justify-between px-3 py-1.5 bg-slate-900 border-b border-slate-800 text-[11px]">
-                <span class="text-blue-400 font-semibold font-mono">Query #${idx + 1}: ${escapeHtml(q.description || 'Cypher Query')}</span>
-                <button onclick="copyCypherText('${idx}')" class="text-slate-400 hover:text-white flex items-center gap-1 text-[10px]">
-                    <i data-lucide="copy" class="w-3 h-3"></i> Copy
+        <div class="rounded-xl border border-teal-500/20 bg-[#061815]/90 overflow-hidden space-y-1 shadow-sm">
+            <div class="flex items-center justify-between px-3.5 py-2 bg-[#08221d] border-b border-teal-500/20 text-[11px]">
+                <span class="text-teal-300 font-semibold font-mono">Query #${idx + 1}: ${escapeHtml(q.description || 'Cypher Query')}</span>
+                <button onclick="copyCypherText('${idx}')" class="text-cream-300 hover:text-white flex items-center gap-1 text-[10px] px-2 py-0.5 rounded bg-teal-500/10 hover:bg-teal-500/20 border border-teal-500/20 transition">
+                    <i data-lucide="copy" class="w-3 h-3 text-teal-400"></i> Copy
                 </button>
             </div>
-            <pre id="cypher-code-${idx}" class="p-3 text-[11px] font-mono text-pink-300/90 whitespace-pre-wrap leading-relaxed overflow-x-auto">${escapeHtml(q.query)}</pre>
+            <pre id="cypher-code-${idx}" class="p-3.5 text-[11px] font-mono text-teal-200/90 whitespace-pre-wrap leading-relaxed overflow-x-auto">${escapeHtml(q.query)}</pre>
             ${q.params && Object.keys(q.params).length > 0 ? `
-                <div class="px-3 pb-2 text-[10px] text-slate-500 font-mono">
+                <div class="px-3.5 pb-2.5 text-[10px] text-cream-400/70 font-mono">
                     Parameters: ${escapeHtml(JSON.stringify(q.params))}
                 </div>
             ` : ''}
@@ -605,17 +607,17 @@ async function loadSelectedCustomerOverview() {
     }
 }
 
-// Tab Switching
+// Tab Switching (Apple Segmented Glass Control)
 function switchTab(tabName) {
     appState.activeTab = tabName;
     ['evidence', 'cypher', 'memory', 'tasks'].forEach(t => {
         const btn = document.getElementById(`tab-btn-${t}`);
         const content = document.getElementById(`tab-${t}`);
         if (t === tabName) {
-            btn.className = 'px-3.5 py-2.5 font-medium border-b-2 border-blue-500 text-blue-400 flex items-center gap-1.5 whitespace-nowrap';
+            btn.className = 'px-4 py-2.5 font-semibold border-b-2 border-teal-400 text-teal-300 flex items-center gap-2 whitespace-nowrap bg-teal-950/40 rounded-t-xl transition-all';
             content.classList.remove('hidden');
         } else {
-            btn.className = 'px-3.5 py-2.5 font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-1.5 whitespace-nowrap';
+            btn.className = 'px-4 py-2.5 font-medium border-b-2 border-transparent text-cream-300/60 hover:text-cream-100 flex items-center gap-2 whitespace-nowrap transition-all hover:bg-teal-950/20';
             content.classList.add('hidden');
         }
     });
@@ -836,10 +838,10 @@ function escapeHtml(str) {
 function formatMarkdown(text) {
     if (!text) return '';
     let formatted = escapeHtml(text);
-    // Bold
-    formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong class="text-slate-100">$1</strong>');
-    // Bullet points
-    formatted = formatted.replace(/^• (.*$)/gim, '<div class="flex items-start gap-1.5"><span class="text-blue-400 mt-0.5">•</span><span>$1</span></div>');
+    // Bold with cream highlight
+    formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong class="text-cream-50 font-bold">$1</strong>');
+    // Bullet points with sea-green accent dot
+    formatted = formatted.replace(/^• (.*$)/gim, '<div class="flex items-start gap-2"><span class="text-teal-400 mt-0.5 font-bold">•</span><span>$1</span></div>');
     // Line breaks
     formatted = formatted.replace(/\n\n/g, '<div class="h-2"></div>');
     formatted = formatted.replace(/\n/g, '<br/>');
