@@ -33,12 +33,18 @@ app.include_router(router)
 
 # Mount Frontend directory
 FRONTEND_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend")
+DIST_DIR = os.path.join(FRONTEND_DIR, "dist")
+SERVE_DIR = DIST_DIR if os.path.exists(os.path.join(DIST_DIR, "index.html")) else FRONTEND_DIR
+
+if os.path.exists(os.path.join(DIST_DIR, "assets")):
+    app.mount("/assets", StaticFiles(directory=os.path.join(DIST_DIR, "assets")), name="assets")
+
 if os.path.exists(FRONTEND_DIR):
     app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
 
     @app.get("/")
     def serve_frontend():
-        return FileResponse(os.path.join(FRONTEND_DIR, "index.html"))
+        return FileResponse(os.path.join(SERVE_DIR, "index.html"))
 
 @app.on_event("startup")
 def on_startup():
