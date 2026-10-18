@@ -269,11 +269,11 @@ function renderAgentResponse(data) {
     const riskCircle = document.getElementById('risk-circle');
     riskCircle.innerText = riskScore;
     if (riskScore > 70) {
-        riskCircle.className = 'w-10 h-10 rounded-full border-4 border-rose-500 bg-rose-950/40 text-rose-300 flex items-center justify-center font-bold text-xs';
+        riskCircle.className = 'apple-ring-outer border-rose-500/30 border-t-rose-400 border-r-rose-500 text-rose-300 bg-rose-950/30 font-bold font-mono text-sm';
     } else if (riskScore > 35) {
-        riskCircle.className = 'w-10 h-10 rounded-full border-4 border-amber-500 bg-amber-950/40 text-amber-300 flex items-center justify-center font-bold text-xs';
+        riskCircle.className = 'apple-ring-outer border-amber-500/30 border-t-amber-400 border-r-amber-500 text-amber-300 bg-amber-950/30 font-bold font-mono text-sm';
     } else {
-        riskCircle.className = 'w-10 h-10 rounded-full border-4 border-emerald-500 bg-emerald-950/40 text-emerald-300 flex items-center justify-center font-bold text-xs';
+        riskCircle.className = 'apple-ring-outer border-teal-500/30 border-t-teal-400 border-r-emerald-400 text-teal-300 bg-teal-950/30 font-bold font-mono text-sm';
     }
 
     // 3. Plain English Rationale
@@ -286,15 +286,15 @@ function renderAgentResponse(data) {
     if (conditions.length > 0) {
         conditions.forEach(cond => {
             const li = document.createElement('li');
-            li.className = 'flex items-start gap-2 bg-slate-900/60 p-2 rounded border border-slate-800';
+            li.className = 'flex items-start gap-2.5 bg-[#08221d]/60 p-3 rounded-xl border border-teal-500/15 text-cream-200 shadow-sm';
             li.innerHTML = `
-                <input type="checkbox" checked class="mt-0.5 rounded bg-slate-800 border-slate-700 text-blue-500 focus:ring-0">
-                <span class="leading-snug">${escapeHtml(cond)}</span>
+                <input type="checkbox" checked class="mt-0.5 rounded bg-teal-950 border-teal-600 text-teal-400 focus:ring-0 cursor-pointer">
+                <span class="leading-relaxed text-xs">${escapeHtml(cond)}</span>
             `;
             condList.appendChild(li);
         });
     } else {
-        condList.innerHTML = '<li class="text-slate-500 italic text-[11px]">No special conditions required (Standard terms apply).</li>';
+        condList.innerHTML = '<li class="text-cream-400/60 italic text-[11px] p-2">Standard trade terms apply.</li>';
     }
 
     // 5. Proposed Next Action Box
