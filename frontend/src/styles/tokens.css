@@ -1,0 +1,47 @@
+:root {
+  /* Stage (dark 3D universe) */
+  --color-stage: #0b1210;
+  --color-stage-deep: #060a09;
+  --color-stage-elevated: #111a17;
+
+  /* Solid Reading Surfaces (Ledger / Paper) */
+  --color-paper: #eee8da;
+  --color-paper-light: #f7f3ea;
+  --color-paper-dark: #121a17;
+  --color-paper-rule: rgba(26, 36, 32, 0.09);
+  --color-paper-edge: #d8d0bf;
+
+  /* Text & Ink */
+  --color-ink: #1a2420;
+  --color-ink-muted: #55635d;
+  --color-ink-subtle: #7d8b85;
+  --color-chalk: #f4f0e6;
+  --color-muted: #8a9890;
+  --color-muted-dim: #44514b;
+
+  /* Semantic Palettes (strictly no purple/violet) */
+  --color-naira-green: #1e7f55;
+  --color-naira-green-light: #2da36f;
+  --color-naira-green-dim: rgba(30, 127, 85, 0.14);
+  --color-naira-green-border: rgba(30, 127, 85, 0.35);
+
+  --color-brass: #c69234;
+  --color-brass-light: #dcab4a;
+  --color-brass-dim: rgba(198, 146, 52, 0.14);
+  --color-brass-border: rgba(198, 146, 52, 0.35);
+
+  --color-vermilion: #c2412d;
+  --color-vermilion-light: #dc5540;
+  --color-vermilion-dim: rgba(194, 65, 45, 0.14);
+  --color-vermilion-border: rgba(194, 65, 45, 0.35);
+
+  /* Glass Material Recipe */
+  --glass-bg: rgba(217, 212, 196, 0.07);
+  --glass-bg-hover: rgba(217, 212, 196, 0.11);
+  --glass-bg-active: rgba(217, 212, 196, 0.14);
+  --glass-edge: rgba(244, 240, 230, 0.11);
+  --glass-edge-strong: rgba(244, 240, 230, 0.22);
+  --glass-shine: rgba(244, 240, 230, 0.18);
+  --glass-blur: 22px;
+  --glass-saturate: 140%;
+}
