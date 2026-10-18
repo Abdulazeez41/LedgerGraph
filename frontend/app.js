@@ -20,11 +20,11 @@ const NODE_COLORS = {
     OverdueInvoice: { background: '#ea580c', border: '#c2410c', font: '#ffffff' },
     Payment: { background: '#10b981', border: '#047857', font: '#fdfbf7' },
     Dispute: { background: '#e11d48', border: '#9f1239', font: '#ffffff' },
-    Supplier: { background: '#8b5cf6', border: '#7c3aed', font: '#fdfbf7' },
+    Supplier: { background: '#0e7490', border: '#155e75', font: '#fdfbf7' },
     Product: { background: '#2dd4bf', border: '#0f766e', font: '#04100e' },
-    AgentDecision: { background: '#3b82f6', border: '#2563eb', font: '#ffffff' },
-    AgentMemory: { background: '#a855f7', border: '#9333ea', font: '#ffffff' },
-    AgentTask: { background: '#eab308', border: '#ca8a04', font: '#04100e' }
+    AgentDecision: { background: '#2563eb', border: '#1d4ed8', font: '#ffffff' },
+    AgentMemory: { background: '#b45309', border: '#92400e', font: '#ffffff' },
+    AgentTask: { background: '#ca8a04', border: '#a16207', font: '#04100e' }
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -127,8 +127,8 @@ async function loadCustomerDropdown() {
         appState.customersList.forEach(c => {
             const opt = document.createElement('option');
             opt.value = c.name;
-            const riskLabel = c.risk_score > 70 ? '🚨' : (c.risk_score > 40 ? '⚠️' : '🟢');
-            opt.innerText = `${riskLabel} ${c.name} (Risk: ${c.risk_score})`;
+            const riskTier = c.risk_score > 70 ? 'High Risk' : (c.risk_score > 40 ? 'Moderate' : 'Low Risk');
+            opt.innerText = `${c.name} (${riskTier}: ${c.risk_score}/100)`;
             select.appendChild(opt);
         });
 
@@ -202,7 +202,7 @@ async function handleChatSubmit(e) {
         checkDatabaseHealth();
     } catch (err) {
         console.error(err);
-        appendChatMessage('agent', `Encountered an error running the graph copilot: ${err.message}`);
+        appendChatMessage('agent', `Encountered an error during graph evaluation: ${err.message}`);
     } finally {
         document.getElementById('agent-thinking-badge').classList.add('hidden');
         document.getElementById('btn-send').disabled = false;
@@ -236,7 +236,7 @@ function appendChatMessage(sender, text, amount = 0, rec = null, conf = null) {
         const formattedText = formatMarkdown(text);
         msgDiv.innerHTML = `
             <div class="flex items-center justify-between text-[11px] text-cream-400/80">
-                <span class="flex items-center gap-1.5 text-teal-300 font-semibold"><i data-lucide="sparkles" class="w-3.5 h-3.5 text-teal-400"></i> LedgerGraph Copilot</span>
+                <span class="flex items-center gap-1.5 text-teal-300 font-semibold"><i data-lucide="activity" class="w-3.5 h-3.5 text-teal-400"></i> LedgerGraph Assessment</span>
                 ${recBadge}
             </div>
             <div class="leading-relaxed space-y-1.5 text-cream-200 text-xs">${formattedText}</div>
@@ -457,7 +457,7 @@ async function loadInvoicesHistory(customerName) {
             }
 
             const disputeBadge = r.dispute_reason 
-                ? `<span class="text-rose-400 font-medium">⚠️ ${escapeHtml(r.dispute_reason)} [${r.dispute_severity || 'MED'}]</span>`
+                ? `<span class="text-rose-400 font-medium"><span class="inline-block w-1.5 h-1.5 rounded-full bg-rose-400 mr-1.5"></span>${escapeHtml(r.dispute_reason)} [${r.dispute_severity || 'MED'}]</span>`
                 : '<span class="text-cream-400/50">None</span>';
 
             const paidAmount = r.paid_amount ? `$${Number(r.paid_amount).toLocaleString()}` : '$0.00';
@@ -489,10 +489,10 @@ async function loadDecisionsAndMemories(customerName) {
         const memories = data.memories || [];
         if (memories.length > 0) {
             memList.innerHTML = memories.map(m => `
-                <div class="p-3 rounded-xl bg-purple-950/25 border border-purple-800/30 space-y-1.5 backdrop-blur-sm shadow-sm">
+                <div class="p-3.5 rounded-xl bg-[#08221d]/80 border border-teal-500/20 space-y-1.5 backdrop-blur-sm shadow-sm">
                     <div class="flex items-center justify-between text-[11px]">
-                        <span class="font-bold text-purple-200">[${escapeHtml(m.memory_type)}]</span>
-                        <span class="text-[10px] text-purple-300 font-mono px-2 py-0.5 rounded bg-purple-900/40 border border-purple-700/40">Importance: ${m.importance}/10</span>
+                        <span class="font-bold text-teal-300 font-mono">[${escapeHtml(m.memory_type)}]</span>
+                        <span class="text-[10px] text-cream-200 font-mono px-2 py-0.5 rounded bg-teal-950/60 border border-teal-500/30">Importance: ${m.importance}/10</span>
                     </div>
                     <p class="text-cream-100 text-xs leading-relaxed">${escapeHtml(m.content)}</p>
                     <div class="text-[10px] text-cream-400/70">${escapeHtml(m.created_at || '')}</div>
@@ -656,7 +656,7 @@ function openReminderModal() {
 async function approveCurrentRecommendation() {
     if (!appState.currentResponse) return;
     const rec = appState.currentResponse.recommendation;
-    alert(`✅ Action confirmed! Recommendation "${rec}" executed and logged in graph ledger.`);
+    alert(`Action confirmed: Recommendation "${rec}" executed and logged in graph ledger.`);
 }
 
 async function submitOverride() {

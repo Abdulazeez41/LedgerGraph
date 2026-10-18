@@ -1,27 +1,29 @@
 import json
 import logging
 import re
-from typing import Any, Dict, List, Optional
 from datetime import datetime
-from backend.config import settings
-from backend.db.falkordb_client import db_client
+from typing import Any, Dict, List, Optional
+
+from backend.agents.prompts import LEDGERGRAPH_SYSTEM_PROMPT, USER_ANALYSIS_PROMPT
+from backend.agents.risk_engine import evaluate_graph_risk
 from backend.agents.tools import (
     GraphEvidenceTracker,
-    get_customer_profile,
-    get_payment_history,
-    find_connected_risk,
-    get_supplier_exposure,
     calculate_cash_flow_impact,
+    create_follow_up_task,
+    find_connected_risk,
+    get_customer_profile,
+    get_customer_subgraph,
+    get_payment_history,
     get_previous_decisions,
+    get_supplier_exposure,
     save_agent_decision,
     save_agent_memory,
-    create_follow_up_task,
-    get_customer_subgraph
 )
-from backend.agents.risk_engine import evaluate_graph_risk
-from backend.agents.prompts import LEDGERGRAPH_SYSTEM_PROMPT, USER_ANALYSIS_PROMPT
+from backend.config import settings
+from backend.db.falkordb_client import db_client
 
 logger = logging.getLogger(__name__)
+
 
 class LedgerGraphAgent:
     def __init__(self):
@@ -29,9 +31,9 @@ class LedgerGraphAgent:
         if settings.OPENAI_API_KEY:
             try:
                 from openai import OpenAI
+
                 self._openai_client = OpenAI(
-                    api_key=settings.OPENAI_API_KEY,
-                    base_url=settings.OPENAI_BASE_URL
+                    api_key=settings.OPENAI_API_KEY, base_url=settings.OPENAI_BASE_URL
                 )
             except Exception as e:
                 logger.warning(f"Could not initialize OpenAI client: {e}")
@@ -57,28 +59,34 @@ class LedgerGraphAgent:
 
         # Extract amount with currency symbols ($, ₦, €, £) or plain numbers
         amount = 0.0
-        m_curr = re.search(r'[\$₦€£]\s*([0-9,]+(?:\.[0-9]+)?)', text)
+        m_curr = re.search(r"[\$₦€£]\s*([0-9,]+(?:\.[0-9]+)?)", text)
         if m_curr:
             try:
                 amount = float(m_curr.group(1).replace(",", ""))
             except ValueError:
                 pass
         else:
-            m_k = re.search(r'([0-9]+(?:\.[0-9]+)?)\s*(?:thousand|k)\b', text, re.IGNORECASE)
+            m_k = re.search(
+                r"([0-9]+(?:\.[0-9]+)?)\s*(?:thousand|k)\b", text, re.IGNORECASE
+            )
             if m_k:
                 try:
                     amount = float(m_k.group(1)) * 1_000
                 except ValueError:
                     pass
             else:
-                m_mill = re.search(r'([0-9]+(?:\.[0-9]+)?)\s*(?:million|m)\b', text, re.IGNORECASE)
+                m_mill = re.search(
+                    r"([0-9]+(?:\.[0-9]+)?)\s*(?:million|m)\b", text, re.IGNORECASE
+                )
                 if m_mill:
                     try:
                         amount = float(m_mill.group(1)) * 1_000_000
                     except ValueError:
                         pass
                 else:
-                    m_num = re.search(r'\b([1-9][0-9]{3,}(?:,[0-9]{3})*(?:\.[0-9]+)?)\b', text)
+                    m_num = re.search(
+                        r"\b([1-9][0-9]{3,}(?:,[0-9]{3})*(?:\.[0-9]+)?)\b", text
+                    )
                     if m_num:
                         try:
                             amount = float(m_num.group(1).replace(",", ""))
@@ -87,7 +95,9 @@ class LedgerGraphAgent:
 
         return detected_customer, amount
 
-    def handle_aggregate_query(self, question: str, tracker: GraphEvidenceTracker) -> Dict[str, Any]:
+    def handle_aggregate_query(
+        self, question: str, tracker: GraphEvidenceTracker
+    ) -> Dict[str, Any]:
         """Handles portfolio-level questions not tied to a single customer."""
         sym = settings.CURRENCY_SYMBOL
         q_lower = question.lower()
@@ -106,17 +116,21 @@ class LedgerGraphAgent:
             ORDER BY c.risk_score DESC, overdue_balance DESC
             LIMIT 5
             """
-            tracker.record_query(cypher, {}, "Find top high-risk customers across the graph")
+            tracker.record_query(
+                cypher, {}, "Find top high-risk customers across the graph"
+            )
             _, rows, _ = db_client.execute_query(cypher)
 
             explanation = (
                 "Based on connected graph analysis in FalkorDB, here are the highest credit risk accounts this week:\n\n"
-                + "\n".join([
-                    f"• **{r['customer']}** (Risk Score: {r['risk_score']}/100) — "
-                    f"{r['overdue_count']} overdue invoices totaling **{sym}{r['overdue_balance']:,.2f}** "
-                    f"(Credit Limit: {sym}{r['credit_limit']:,.2f})"
-                    for r in rows
-                ])
+                + "\n".join(
+                    [
+                        f"• **{r['customer']}** (Risk Score: {r['risk_score']}/100) - "
+                        f"{r['overdue_count']} overdue invoices totaling **{sym}{r['overdue_balance']:,.2f}** "
+                        f"(Credit Limit: {sym}{r['credit_limit']:,.2f})"
+                        for r in rows
+                    ]
+                )
             )
             top_name = rows[0]["customer"] if rows else "Top Risk Entity"
             return {
@@ -125,13 +139,15 @@ class LedgerGraphAgent:
                 "business_explanation": explanation,
                 "recommended_conditions": [
                     "Institute immediate credit freeze on accounts with risk scores > 70",
-                    "Dispatch recovery notices before shipping any new orders"
+                    "Dispatch recovery notices before shipping any new orders",
                 ],
                 "proposed_action": f"Review credit freeze for {top_name}",
                 "action_type": "FREEZE_CREDIT",
                 "evidence_path": rows,
                 "cypher_queries": tracker.queries_executed,
-                "subgraph": get_customer_subgraph(top_name) if rows else {"nodes": [], "links": []}
+                "subgraph": get_customer_subgraph(top_name)
+                if rows
+                else {"nodes": [], "links": []},
             }
 
         # 2. Invoices to chase today
@@ -150,18 +166,26 @@ class LedgerGraphAgent:
             ORDER BY i.days_overdue DESC, i.amount DESC
             LIMIT 8
             """
-            tracker.record_query(cypher, {}, "Find overdue invoices requiring recovery chasing")
+            tracker.record_query(
+                cypher, {}, "Find overdue invoices requiring recovery chasing"
+            )
             _, rows, _ = db_client.execute_query(cypher)
 
             total_overdue = sum(r["amount"] for r in rows)
             explanation = (
                 f"You have **{len(rows)} priority overdue invoices** totaling **{sym}{total_overdue:,.2f}** requiring immediate chase:\n\n"
-                + "\n".join([
-                    f"• **{r['customer']}** — Invoice `{r['invoice_number']}` for **{sym}{r['amount']:,.2f}** "
-                    f"({r['days_overdue']} days overdue since {r['due_date']})"
-                    + (f" [⚠️ Dispute: {r['dispute_reason']}]" if r.get("dispute_reason") else "")
-                    for r in rows
-                ])
+                + "\n".join(
+                    [
+                        f"• **{r['customer']}** - Invoice `{r['invoice_number']}` for **{sym}{r['amount']:,.2f}** "
+                        f"({r['days_overdue']} days overdue since {r['due_date']})"
+                        + (
+                            f" [⚠️ Dispute: {r['dispute_reason']}]"
+                            if r.get("dispute_reason")
+                            else ""
+                        )
+                        for r in rows
+                    ]
+                )
             )
             first_inv = rows[0] if rows else {}
             return {
@@ -170,7 +194,7 @@ class LedgerGraphAgent:
                 "business_explanation": explanation,
                 "recommended_conditions": [
                     "Prioritize invoices exceeding 30 days overdue",
-                    "Offer immediate 2% settlement discount for balances cleared within 48 hours"
+                    "Offer immediate 2% settlement discount for balances cleared within 48 hours",
                 ],
                 "proposed_action": f"Draft payment reminder for {first_inv.get('customer')} ({first_inv.get('invoice_number')})",
                 "action_type": "PAYMENT_REMINDER",
@@ -178,11 +202,13 @@ class LedgerGraphAgent:
                     "customer": first_inv.get("customer"),
                     "invoice": first_inv.get("invoice_number"),
                     "amount": first_inv.get("amount"),
-                    "phone": first_inv.get("phone")
+                    "phone": first_inv.get("phone"),
                 },
                 "evidence_path": rows,
                 "cypher_queries": tracker.queries_executed,
-                "subgraph": get_customer_subgraph(first_inv.get("customer")) if first_inv else {"nodes": [], "links": []}
+                "subgraph": get_customer_subgraph(first_inv.get("customer"))
+                if first_inv
+                else {"nodes": [], "links": []},
             }
 
         # 3. Connected delinquent customers (Default rings / Phoenix companies)
@@ -202,18 +228,24 @@ class LedgerGraphAgent:
                    sum(i2.amount) AS connected_overdue_amount
             ORDER BY connected_overdue_amount DESC
             """
-            tracker.record_query(cypher, {}, "Multi-hop query for contact-sharing networks and debt contagion")
+            tracker.record_query(
+                cypher,
+                {},
+                "Multi-hop query for contact-sharing networks and debt contagion",
+            )
             _, rows, _ = db_client.execute_query(cypher)
 
             explanation = (
                 "**Graph Contact-Sharing & Credit Contagion Network:**\n\n"
-                + "\n".join([
-                    f"• **{r['customer_1']}** ↔ **{r['customer_2']}**: "
-                    f"Share {'Phone, ' if r['shared_phone'] else ''}{'Email, ' if r['shared_email'] else ''}{'Warehouse/Address' if r['shared_address'] else ''} "
-                    f"({r['address'] or r['phone']}). "
-                    f"**Connected Overdue Exposure:** {sym}{r['connected_overdue_amount']:,.2f} ({r['connected_overdue_count']} overdue invoices)."
-                    for r in rows
-                ])
+                + "\n".join(
+                    [
+                        f"• **{r['customer_1']}** ↔ **{r['customer_2']}**: "
+                        f"Share {'Phone, ' if r['shared_phone'] else ''}{'Email, ' if r['shared_email'] else ''}{'Warehouse/Address' if r['shared_address'] else ''} "
+                        f"({r['address'] or r['phone']}). "
+                        f"**Connected Overdue Exposure:** {sym}{r['connected_overdue_amount']:,.2f} ({r['connected_overdue_count']} overdue invoices)."
+                        for r in rows
+                    ]
+                )
             )
             return {
                 "recommendation": "ESCALATE",
@@ -221,13 +253,15 @@ class LedgerGraphAgent:
                 "business_explanation": explanation,
                 "recommended_conditions": [
                     "Flag connected entities under unified group credit ceiling",
-                    "Do not disburse new credit to sister entity when linked debtor is in default"
+                    "Do not disburse new credit to sister entity when linked debtor is in default",
                 ],
                 "proposed_action": "Consolidate credit limits for connected customer clusters",
                 "action_type": "ESCALATE_GROUP",
                 "evidence_path": rows,
                 "cypher_queries": tracker.queries_executed,
-                "subgraph": get_customer_subgraph(rows[0]["customer_1"]) if rows else {"nodes": [], "links": []}
+                "subgraph": get_customer_subgraph(rows[0]["customer_1"])
+                if rows
+                else {"nodes": [], "links": []},
             }
 
         return None
@@ -236,7 +270,7 @@ class LedgerGraphAgent:
         self,
         question: str,
         customer_name: Optional[str] = None,
-        order_amount: Optional[float] = None
+        order_amount: Optional[float] = None,
     ) -> Dict[str, Any]:
         """
         Executes the 10-step LedgerGraph agent workflow.
@@ -246,7 +280,11 @@ class LedgerGraphAgent:
         # Step 1: Identify customer and order amount if not passed
         detected_cust, detected_amt = self.detect_customer_and_amount(question)
         target_customer = customer_name or detected_cust
-        target_amount = order_amount if order_amount is not None and order_amount > 0 else detected_amt
+        target_amount = (
+            order_amount
+            if order_amount is not None and order_amount > 0
+            else detected_amt
+        )
 
         # Handle portfolio/aggregate questions if no specific customer detected
         if not target_customer:
@@ -259,7 +297,7 @@ class LedgerGraphAgent:
                 "recommendation": "HOLD",
                 "confidence": 0.5,
                 "business_explanation": (
-                    f"I couldn't identify a specific customer in your question: *\"{question}\"*.\n\n"
+                    f'I couldn\'t identify a specific customer in your question: *"{question}"*.\n\n'
                     f"Try asking about a specific customer like **{sample_names[0]}**, **{sample_names[1]}**, or ask:\n"
                     f"- *'Should I approve a {settings.CURRENCY_SYMBOL}20,000 order for BrightMart on 30-day credit?'*\n"
                     f"- *'Which customers are highest credit risk this week?'*\n"
@@ -270,7 +308,7 @@ class LedgerGraphAgent:
                 "proposed_action": "Select a customer to evaluate",
                 "evidence_path": [],
                 "cypher_queries": tracker.queries_executed,
-                "subgraph": {"nodes": [], "links": []}
+                "subgraph": {"nodes": [], "links": []},
             }
 
         # Step 2: Query Prior Decisions and Memories
@@ -278,7 +316,12 @@ class LedgerGraphAgent:
 
         # Check if user specifically asked about prior decisions / memory
         q_lower = question.lower()
-        if ("what did we decide" in q_lower or "last time" in q_lower or "previous decision" in q_lower or "remember" in q_lower):
+        if (
+            "what did we decide" in q_lower
+            or "last time" in q_lower
+            or "previous decision" in q_lower
+            or "remember" in q_lower
+        ):
             dec_list = prev_decisions.get("decisions", [])
             mem_list = prev_decisions.get("memories", [])
             tsk_list = prev_decisions.get("tasks", [])
@@ -297,27 +340,37 @@ class LedgerGraphAgent:
                 if mem_list:
                     explanation_parts.append("**Saved Graph Memories:**")
                     for m in mem_list:
-                        explanation_parts.append(f"• [{m.get('memory_type')}] {m.get('content')} *(Importance: {m.get('importance')}/10)*")
+                        explanation_parts.append(
+                            f"• [{m.get('memory_type')}] {m.get('content')} *(Importance: {m.get('importance')}/10)*"
+                        )
                 if tsk_list:
                     explanation_parts.append("\n**Open Follow-up Tasks:**")
                     for t in tsk_list:
-                        explanation_parts.append(f"• **{t.get('title')}** (Status: `{t.get('status')}`, Due: {t.get('due_date')}) — {t.get('description')}")
+                        explanation_parts.append(
+                            f"• **{t.get('title')}** (Status: `{t.get('status')}`, Due: {t.get('due_date')}) - {t.get('description')}"
+                        )
 
                 subgraph = get_customer_subgraph(target_customer)
                 return {
-                    "recommendation": dec_list[0].get("recommendation") if dec_list else "APPROVE WITH CONDITIONS",
-                    "confidence": float(dec_list[0].get("confidence") or 0.85) if dec_list else 0.85,
+                    "recommendation": dec_list[0].get("recommendation")
+                    if dec_list
+                    else "APPROVE WITH CONDITIONS",
+                    "confidence": float(dec_list[0].get("confidence") or 0.85)
+                    if dec_list
+                    else 0.85,
                     "business_explanation": "\n".join(explanation_parts),
                     "recommended_conditions": [
                         "Adhere to prior agreed terms recorded in graph memory",
-                        "Review open follow-up inspection tasks before altering credit ceiling"
+                        "Review open follow-up inspection tasks before altering credit ceiling",
                     ],
-                    "proposed_action": tsk_list[0].get("title") if tsk_list else f"Review credit file for {target_customer}",
+                    "proposed_action": tsk_list[0].get("title")
+                    if tsk_list
+                    else f"Review credit file for {target_customer}",
                     "action_type": "VIEW_MEMORY",
                     "evidence_path": dec_list + mem_list,
                     "cypher_queries": tracker.queries_executed,
                     "subgraph": subgraph,
-                    "previous_decisions": prev_decisions
+                    "previous_decisions": prev_decisions,
                 }
 
         # Step 3: Run Graph Data Tools
@@ -331,13 +384,15 @@ class LedgerGraphAgent:
                 "proposed_action": "Verify customer business name",
                 "evidence_path": [],
                 "cypher_queries": tracker.queries_executed,
-                "subgraph": {"nodes": [], "links": []}
+                "subgraph": {"nodes": [], "links": []},
             }
 
         history = get_payment_history(target_customer, tracker=tracker)
         connected_risk = find_connected_risk(target_customer, tracker=tracker)
         supplier_exp = get_supplier_exposure(target_customer, tracker=tracker)
-        cash_flow = calculate_cash_flow_impact(target_customer, target_amount, tracker=tracker)
+        cash_flow = calculate_cash_flow_impact(
+            target_customer, target_amount, tracker=tracker
+        )
 
         # Step 4: Evaluate Risk with Rule Engine
         risk_eval = evaluate_graph_risk(
@@ -345,7 +400,7 @@ class LedgerGraphAgent:
             history=history,
             connected_risks=connected_risk,
             previous_decisions=prev_decisions,
-            proposed_order_amount=target_amount
+            proposed_order_amount=target_amount,
         )
 
         recommendation = risk_eval["recommendation"]
@@ -362,11 +417,15 @@ class LedgerGraphAgent:
             supplier_exposure=supplier_exp,
             cash_flow=cash_flow,
             previous_decisions=prev_decisions,
-            risk_eval=risk_eval
+            risk_eval=risk_eval,
         )
 
         # Step 6: Formulate Next Action & Action Payload
-        proposed_action = risk_eval["proposed_actions"][0] if risk_eval["proposed_actions"] else "Monitor payment settlements"
+        proposed_action = (
+            risk_eval["proposed_actions"][0]
+            if risk_eval["proposed_actions"]
+            else "Monitor payment settlements"
+        )
         action_type = "CONDITIONAL_APPROVAL"
         if recommendation == "APPROVE":
             action_type = "APPROVE_ORDER"
@@ -388,7 +447,7 @@ class LedgerGraphAgent:
             evidence_node_ids=evidence_ids,
             outcome="Recommendation surfaced to business owner in dashboard.",
             user_feedback="Awaiting user action",
-            tracker=tracker
+            tracker=tracker,
         )
 
         # Retrieve visual subgraph
@@ -419,7 +478,7 @@ class LedgerGraphAgent:
                 "overdue_balance": profile["overdue_balance"],
                 "customer_phone": profile["phone"],
                 "credit_limit": profile["credit_limit"],
-                "order_amount": target_amount
+                "order_amount": target_amount,
             },
             "profile": profile,
             "connected_risk": connected_risk,
@@ -429,7 +488,7 @@ class LedgerGraphAgent:
             "evidence_nodes": tracker.evidence_nodes,
             "evidence_edges": tracker.evidence_edges,
             "cypher_queries": tracker.queries_executed,
-            "subgraph": subgraph
+            "subgraph": subgraph,
         }
 
     def generate_explanation(
@@ -443,7 +502,7 @@ class LedgerGraphAgent:
         supplier_exposure: List[Dict[str, Any]],
         cash_flow: Dict[str, Any],
         previous_decisions: Dict[str, Any],
-        risk_eval: Dict[str, Any]
+        risk_eval: Dict[str, Any],
     ) -> str:
         """Generates clear business reasoning via LLM if API key is provided, or via graph synthesizer."""
         # Try OpenAI API first if client is configured
@@ -456,26 +515,30 @@ class LedgerGraphAgent:
                     profile_json=json.dumps(profile, default=str),
                     history_json=json.dumps(history[:6], default=str),
                     connected_risk_json=json.dumps(connected_risk, default=str),
-                    supplier_exposure_json=json.dumps(supplier_exposure[:4], default=str),
+                    supplier_exposure_json=json.dumps(
+                        supplier_exposure[:4], default=str
+                    ),
                     cash_flow_json=json.dumps(cash_flow, default=str),
                     previous_decisions_json=json.dumps(previous_decisions, default=str),
-                    risk_assessment_json=json.dumps(risk_eval, default=str)
+                    risk_assessment_json=json.dumps(risk_eval, default=str),
                 )
 
                 response = self._openai_client.chat.completions.create(
                     model=settings.OPENAI_MODEL,
                     messages=[
                         {"role": "system", "content": LEDGERGRAPH_SYSTEM_PROMPT},
-                        {"role": "user", "content": user_content}
+                        {"role": "user", "content": user_content},
                     ],
                     temperature=0.2,
-                    max_tokens=650
+                    max_tokens=650,
                 )
                 content = response.choices[0].message.content
                 if content and len(content.strip()) > 30:
                     return content.strip()
             except Exception as e:
-                logger.warning(f"OpenAI completion failed (falling back to native graph reasoner): {e}")
+                logger.warning(
+                    f"OpenAI completion failed (falling back to native graph reasoner): {e}"
+                )
 
         # Native Graph Reasoner (offline/standalone)
         sym = settings.CURRENCY_SYMBOL
@@ -483,7 +546,9 @@ class LedgerGraphAgent:
         lines = []
 
         if rec == "APPROVE":
-            lines.append(f"**Recommendation: APPROVE** (Risk Score: {risk_eval['calculated_risk_score']}/100)")
+            lines.append(
+                f"**Recommendation: APPROVE** (Risk Score: {risk_eval['calculated_risk_score']}/100)"
+            )
             lines.append(
                 f"**{customer_name}** maintains an exemplary graph payment record. "
                 f"They have completed **{profile['total_orders']} orders** with **{sym}{profile['total_paid']:,.2f}** fully settled on time. "
@@ -496,7 +561,9 @@ class LedgerGraphAgent:
                 )
 
         elif rec == "APPROVE WITH CONDITIONS":
-            lines.append(f"**Recommendation: APPROVE WITH CONDITIONS** (Risk Score: {risk_eval['calculated_risk_score']}/100)")
+            lines.append(
+                f"**Recommendation: APPROVE WITH CONDITIONS** (Risk Score: {risk_eval['calculated_risk_score']}/100)"
+            )
             lines.append(
                 f"**{customer_name}** has a viable trading relationship with cumulative settlements of **{sym}{profile['total_paid']:,.2f}**, "
                 f"but graph traversal revealed specific credit vulnerabilities:"
@@ -515,7 +582,9 @@ class LedgerGraphAgent:
             )
 
         elif rec == "HOLD":
-            lines.append(f"**Recommendation: HOLD ORDER / CREDIT FREEZE** (Risk Score: {risk_eval['calculated_risk_score']}/100)")
+            lines.append(
+                f"**Recommendation: HOLD ORDER / CREDIT FREEZE** (Risk Score: {risk_eval['calculated_risk_score']}/100)"
+            )
             lines.append(
                 f"Fulfillment for **{customer_name}** must be put on hold immediately. "
                 f"The business currently has **{profile['overdue_invoices_count']} overdue invoices** totaling **{sym}{profile['overdue_balance']:,.2f}**."
@@ -528,7 +597,9 @@ class LedgerGraphAgent:
             )
 
         elif rec == "ESCALATE":
-            lines.append(f"**Recommendation: ESCALATE TO CREDIT COMMITTEE** (Risk Score: {risk_eval['calculated_risk_score']}/100)")
+            lines.append(
+                f"**Recommendation: ESCALATE TO CREDIT COMMITTEE** (Risk Score: {risk_eval['calculated_risk_score']}/100)"
+            )
             lines.append(
                 f"High-priority alert on **{customer_name}**. Graph network analysis uncovered direct contact sharing with known delinquent entities:"
             )
@@ -539,13 +610,16 @@ class LedgerGraphAgent:
                 "Do not fulfill on open credit without personal corporate director guarantees."
             )
 
-        else: # CHASE PAYMENT
-            lines.append(f"**Recommendation: CHASE PAYMENT** (Risk Score: {risk_eval['calculated_risk_score']}/100)")
+        else:  # CHASE PAYMENT
+            lines.append(
+                f"**Recommendation: CHASE PAYMENT** (Risk Score: {risk_eval['calculated_risk_score']}/100)"
+            )
             lines.append(
                 f"**{customer_name}** owes **{sym}{profile['overdue_balance']:,.2f}** across {profile['overdue_invoices_count']} overdue invoices. "
                 f"Immediate structured recovery communications are recommended before considering new order requests."
             )
 
         return "\n".join(lines)
+
 
 agent_instance = LedgerGraphAgent()

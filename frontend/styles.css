@@ -333,10 +333,10 @@ body {
 }
 
 .badge-escalate {
-  background: linear-gradient(135deg, rgba(168, 85, 247, 0.24) 0%, rgba(126, 34, 206, 0.4) 100%);
-  border: 1px solid rgba(192, 132, 252, 0.6);
-  color: #e9d5ff;
-  box-shadow: 0 4px 20px -2px rgba(168, 85, 247, 0.4);
+  background: linear-gradient(135deg, rgba(225, 29, 72, 0.22) 0%, rgba(159, 18, 57, 0.38) 100%);
+  border: 1px solid rgba(244, 63, 94, 0.6);
+  color: #fecdd3;
+  box-shadow: 0 4px 20px -2px rgba(225, 29, 72, 0.35);
 }
 
 .badge-chase {
@@ -447,3 +447,28 @@ body {
 code, pre, .font-mono {
   font-family: 'JetBrains Mono', monospace;
 }
+
+/* macOS Window Dots */
+.mac-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  opacity: 0.75;
+}
+.mac-dot-red { background-color: #ff5f56; border: 1px solid #e0443e; }
+.mac-dot-amber { background-color: #ffbd2e; border: 1px solid #dea123; }
+.mac-dot-green { background-color: #27c93f; border: 1px solid #1aab29; }
+
+/* Apple Segmented Bar Controls */
+.apple-segmented-bar {
+  background: rgba(4, 18, 15, 0.65);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-radius: 9999px;
+  padding: 4px;
+  display: inline-flex;
+  gap: 4px;
+  border: 1px solid rgba(45, 212, 191, 0.18);
+}
+

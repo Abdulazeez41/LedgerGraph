@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>LedgerGraph — SME Credit & Working Capital Copilot</title>
+    <title>LedgerGraph — Credit Risk &amp; Receivables Ledger</title>
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -32,7 +32,6 @@
                 400: "#cfbea3",
                 500: "#a89475",
               },
-              falkor: "#EC4899",
             },
             fontFamily: {
               sans: [
@@ -71,77 +70,77 @@
       <div class="aurora-blob aurora-3"></div>
     </div>
 
-    <!-- Floating Island Navigation Bar (Apple Floating Glass Capsule) -->
-    <div class="w-full px-5 pt-5 z-40">
-      <header
-        class="max-w-6xl mx-auto glass-panel-elevated rounded-full px-6 py-3.5 flex flex-wrap items-center justify-between gap-4 transition-all duration-300"
+    <!-- macOS Application Chrome Header -->
+    <header class="w-full px-6 pt-5 pb-2 z-40">
+      <div
+        class="max-w-7xl mx-auto glass-panel-elevated rounded-2xl px-6 py-3.5 flex flex-wrap items-center justify-between gap-4 transition-all duration-300"
       >
-        <!-- Brand Header -->
-        <div class="flex items-center gap-3.5">
-          <div
-            class="w-10 h-10 rounded-full bg-gradient-to-tr from-teal-500 via-emerald-400 to-teal-300 flex items-center justify-center shadow-lg shadow-teal-500/25 border border-white/30 transform hover:scale-105 transition-transform duration-300"
-          >
-            <i data-lucide="network" class="w-5 h-5 text-[#03100e] stroke-[2.4]"></i>
+        <!-- Left: macOS Traffic Lights & Brand Title -->
+        <div class="flex items-center gap-4">
+          <div class="flex items-center gap-2">
+            <span class="mac-dot mac-dot-red"></span>
+            <span class="mac-dot mac-dot-amber"></span>
+            <span class="mac-dot mac-dot-green"></span>
           </div>
+          <div class="h-4 w-px bg-teal-500/20"></div>
           <div class="flex items-center gap-3">
-            <span
-              class="text-lg font-bold tracking-tight bg-gradient-to-r from-cream-50 via-cream-100 to-cream-300 bg-clip-text text-transparent"
+            <div
+              class="w-8 h-8 rounded-xl bg-teal-500/20 border border-teal-500/30 flex items-center justify-center text-teal-300 shadow-sm"
             >
-              LedgerGraph
-            </span>
-            <span
-              class="hidden sm:inline-flex items-center gap-1.5 text-[11px] px-3 py-0.5 rounded-full font-medium bg-teal-500/15 text-teal-300 border border-teal-500/30 shadow-sm"
-            >
-              <span class="w-1.5 h-1.5 rounded-full bg-pink-500"></span>
-              FalkorDB Copilot
-            </span>
+              <i data-lucide="network" class="w-4 h-4 stroke-[2.2]"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-bold tracking-tight text-cream-50">LedgerGraph</span>
+                <span class="text-[10px] uppercase font-mono px-2 py-0.5 rounded-md bg-teal-500/15 text-teal-300 border border-teal-500/25">v1.0</span>
+              </div>
+              <p class="text-[10px] text-cream-400 font-medium">Trade Credit &amp; Receivables Ledger</p>
+            </div>
           </div>
         </div>
 
-        <!-- Customer Target Selector & Status Actions -->
-        <div class="flex items-center gap-3">
-          <!-- Target Customer Pill Dropdown -->
-          <div class="relative hidden md:block w-56">
-            <select
-              id="customer-select"
-              onchange="onCustomerSelectChange()"
-              class="glass-pill rounded-full text-xs text-cream-100 px-4 py-1.5 pr-8 focus:outline-none w-full appearance-none cursor-pointer"
-            >
-              <option value="">-- Choose a Customer --</option>
-            </select>
-            <i
-              data-lucide="chevron-down"
-              class="w-3.5 h-3.5 text-teal-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"
-            ></i>
-          </div>
+        <!-- Center: Customer Target Dropdown -->
+        <div class="relative w-64">
+          <select
+            id="customer-select"
+            onchange="onCustomerSelectChange()"
+            class="glass-input rounded-xl text-xs text-cream-100 px-3.5 py-2 pr-8 focus:outline-none w-full appearance-none cursor-pointer font-medium"
+          >
+            <option value="">-- Select Customer Account --</option>
+          </select>
+          <i
+            data-lucide="chevron-down"
+            class="w-3.5 h-3.5 text-teal-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"
+          ></i>
+        </div>
 
-          <!-- FalkorDB Live Status Pill -->
+        <!-- Right: Status & Actions -->
+        <div class="flex items-center gap-3">
+          <!-- Database Status Pill -->
           <div
             id="db-health-badge"
-            class="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#08221e]/80 border border-teal-500/25 text-xs backdrop-blur-md shadow-sm"
+            class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#08221e]/80 border border-teal-500/25 text-xs backdrop-blur-md shadow-sm"
           >
-            <span
-              class="w-2.5 h-2.5 rounded-full bg-teal-400 pulse-dot-sea"
-            ></span>
-            <span class="text-cream-200 font-medium" id="db-status-text"
+            <span class="w-2 h-2 rounded-full bg-teal-400 pulse-dot-sea"></span>
+            <span class="text-cream-200 text-[11px] font-medium" id="db-status-text"
               >FalkorDB: Checking...</span
             >
           </div>
 
-          <!-- Actions -->
+          <!-- Utility Actions -->
           <button
             onclick="openModal('upload-modal')"
-            class="glass-pill px-3.5 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5 shadow-sm"
-            title="Upload CSV demo dataset"
+            class="glass-pill px-3 py-1.5 rounded-xl text-xs font-medium flex items-center gap-1.5 shadow-sm hover:text-white"
+            title="Upload CSV dataset"
           >
             <i data-lucide="upload" class="w-3.5 h-3.5 text-teal-400"></i>
-            <span class="hidden sm:inline">Upload</span>
+            <span class="hidden sm:inline">Upload CSV</span>
           </button>
 
           <button
             onclick="triggerReseed()"
             id="btn-reseed"
-            class="glass-pill px-3.5 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5 shadow-sm text-cream-200"
+            class="glass-pill px-3 py-1.5 rounded-xl text-xs font-medium flex items-center gap-1.5 shadow-sm text-cream-200 hover:text-white"
             title="Reset database to seed graph"
           >
             <i
@@ -149,54 +148,34 @@
               class="w-3.5 h-3.5 text-teal-400"
               id="reseed-icon"
             ></i>
-            <span class="hidden sm:inline">Reset</span>
+            <span class="hidden sm:inline">Reset Graph</span>
           </button>
         </div>
-      </header>
-    </div>
-
-    <!-- Apple Spotlight Hero & Interaction Space (Airy, Generous Whitespace) -->
-    <section class="max-w-4xl mx-auto px-6 pt-10 pb-12 text-center space-y-6 z-30 animate-framer-in">
-      <div class="space-y-3">
-        <div
-          class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-teal-500/10 border border-teal-500/25 text-teal-300 text-xs font-medium shadow-sm"
-        >
-          <i data-lucide="sparkles" class="w-3.5 h-3.5 text-teal-400"></i>
-          <span>Graph-Grounded Intelligence for Developing Markets</span>
-        </div>
-        <h1
-          class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-cream-50 leading-[1.12]"
-        >
-          Trade Credit with <span class="bg-gradient-to-r from-teal-300 via-emerald-300 to-cream-100 bg-clip-text text-transparent">Graph Clarity</span>
-        </h1>
-        <p
-          class="text-base sm:text-lg text-cream-300/80 max-w-2xl mx-auto font-normal leading-relaxed pt-1"
-        >
-          Reasoning over connected customer histories, contact-sharing fraud contagion, and cross-session memory in FalkorDB.
-        </p>
       </div>
+    </header>
 
-      <!-- Apple Spotlight Search Capsule Form -->
+    <!-- Apple Spotlight Search & Evaluation Bar -->
+    <section class="max-w-4xl mx-auto px-6 pt-5 pb-6 text-center space-y-4 z-30 animate-framer-in">
       <form
         id="chat-form"
         onsubmit="handleChatSubmit(event)"
-        class="pt-3 max-w-3xl mx-auto"
+        class="w-full"
       >
         <div
-          class="apple-spotlight-bar rounded-full p-2 pl-6 flex items-center gap-3 transition-all duration-300"
+          class="apple-spotlight-bar rounded-2xl p-2 pl-5 flex items-center gap-3 transition-all duration-300"
         >
-          <i data-lucide="search" class="w-5 h-5 text-teal-400 shrink-0"></i>
+          <i data-lucide="search" class="w-4 h-4 text-teal-400 shrink-0"></i>
           <input
             type="text"
             id="chat-input"
-            placeholder="Ask e.g. Should I approve $20k order for BrightMart on 30-day credit?"
-            class="bg-transparent border-none text-cream-50 placeholder-cream-400/50 text-sm flex-1 focus:outline-none font-medium"
+            placeholder="Search customer, evaluate credit limit, or ask question..."
+            class="bg-transparent border-none text-cream-50 placeholder-cream-400/50 text-xs sm:text-sm flex-1 focus:outline-none font-medium"
           />
           <div class="flex items-center gap-2 pr-1">
             <div
-              class="hidden sm:flex items-center gap-1.5 bg-[#041512]/60 border border-teal-500/25 px-3 py-1.5 rounded-full text-xs text-cream-300"
+              class="hidden sm:flex items-center gap-1.5 bg-[#041512]/70 border border-teal-500/25 px-3 py-1.5 rounded-xl text-xs text-cream-300"
             >
-              <span class="text-teal-400 font-semibold">$</span>
+              <span class="text-teal-400 font-semibold text-xs">$</span>
               <input
                 type="number"
                 id="order-amount-input"
@@ -207,7 +186,7 @@
             <button
               type="submit"
               id="btn-send"
-              class="btn-apple-primary px-5 py-2.5 rounded-full text-xs font-semibold flex items-center gap-2 whitespace-nowrap"
+              class="btn-apple-primary px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap"
             >
               <span>Evaluate</span>
               <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
@@ -216,10 +195,10 @@
         </div>
       </form>
 
-      <!-- Quick Interactive Prompt Lozenges (Generously Spaced) -->
-      <div class="flex flex-wrap items-center justify-center gap-2.5 pt-2 text-xs">
+      <!-- Suggested Queries Pills -->
+      <div class="flex flex-wrap items-center justify-center gap-2 text-xs">
         <span class="text-cream-400/70 text-[11px] font-semibold mr-1"
-          >Suggested Queries:</span
+          >Quick Inquiries:</span
         >
         <button
           onclick="
@@ -228,31 +207,31 @@
               20000,
             )
           "
-          class="glass-pill px-4 py-1.5 rounded-full text-cream-100 font-medium whitespace-nowrap"
+          class="glass-pill px-3.5 py-1 rounded-full text-cream-100 text-xs font-medium whitespace-nowrap"
         >
-          $20k Credit for BrightMart?
+          $20,000 Order for BrightMart
         </button>
         <button
           onclick="
             usePrompt('What did we decide about BrightMart last time?')
           "
-          class="glass-pill px-4 py-1.5 rounded-full text-cream-100 font-medium whitespace-nowrap"
+          class="glass-pill px-3.5 py-1 rounded-full text-cream-100 text-xs font-medium whitespace-nowrap"
         >
-          Memory: BrightMart History
+          BrightMart Prior Decisions
         </button>
         <button
           onclick="
             usePrompt('Which customers are highest credit risk this week?')
           "
-          class="glass-pill px-4 py-1.5 rounded-full text-cream-100 font-medium whitespace-nowrap"
+          class="glass-pill px-3.5 py-1 rounded-full text-cream-100 text-xs font-medium whitespace-nowrap"
         >
           Highest Risk Accounts
         </button>
         <button
           onclick="usePrompt('Which invoices should I chase today?')"
-          class="glass-pill px-4 py-1.5 rounded-full text-cream-100 font-medium whitespace-nowrap"
+          class="glass-pill px-3.5 py-1 rounded-full text-cream-100 text-xs font-medium whitespace-nowrap"
         >
-          Invoices to Chase
+          Overdue Invoices to Chase
         </button>
         <button
           onclick="
@@ -260,15 +239,15 @@
               'Which customers are connected to other delinquent customers?',
             )
           "
-          class="glass-pill px-4 py-1.5 rounded-full text-cream-100 font-medium whitespace-nowrap"
+          class="glass-pill px-3.5 py-1 rounded-full text-cream-100 text-xs font-medium whitespace-nowrap"
         >
-          Connected Risk Pairs
+          Shared Contact Risk Pairs
         </button>
       </div>
     </section>
 
     <!-- Main Content Workspace (Generous Grid Whitespace) -->
-    <main class="max-w-6xl mx-auto px-6 pb-20 space-y-10 w-full z-10">
+    <main class="max-w-7xl mx-auto px-6 pb-20 space-y-8 w-full z-10">
       
       <!-- SECTION 1: Executive Verdict & Subgraph Exploration (Balanced 2-Col Grid) -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -508,7 +487,7 @@
                 Dispute</span
               >
               <span class="flex items-center gap-1.5"
-                ><span class="w-2.5 h-2.5 rounded-full bg-purple-400 shadow-sm"></span>
+                ><span class="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-sm"></span>
                 Supplier</span
               >
               <span class="flex items-center gap-1.5"
@@ -530,11 +509,11 @@
       <!-- SECTION 2: Conversational Stream & Segmented Deep-Dive Center (2-Col Grid) -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
-        <!-- Left: Live Reasoning Copilot Feed (5 cols) -->
+        <!-- Left: Evaluation & Decision Log (5 cols) -->
         <div
           class="lg:col-span-5 glass-panel rounded-[32px] p-7 shadow-2xl flex flex-col h-[480px] animate-framer-in stagger-3"
         >
-          <!-- Terminal Header -->
+          <!-- Log Header -->
           <div
             class="flex items-center justify-between pb-4 border-b border-teal-500/15 mb-3"
           >
@@ -542,11 +521,11 @@
               <div
                 class="w-8 h-8 rounded-full bg-teal-500/20 border border-teal-500/30 flex items-center justify-center text-teal-300"
               >
-                <i data-lucide="bot" class="w-4 h-4"></i>
+                <i data-lucide="activity" class="w-4 h-4"></i>
               </div>
               <div>
                 <h3 class="text-sm font-bold text-cream-50">
-                  Copilot Reasoning Stream
+                  Evaluation &amp; Decision Log
                 </h3>
                 <span class="text-[10px] text-cream-400 font-mono"
                   >FalkorDB Cypher Traceability</span
@@ -571,14 +550,14 @@
               class="p-4 rounded-2xl bg-[#08221d]/75 border border-teal-500/20 text-cream-200 space-y-2 backdrop-blur-md shadow-sm"
             >
               <div class="flex items-center gap-2 font-semibold text-teal-300">
-                <i data-lucide="sparkles" class="w-4 h-4 text-teal-400"></i>
-                <span>LedgerGraph Ready</span>
+                <i data-lucide="activity" class="w-4 h-4 text-teal-400"></i>
+                <span>System Ready</span>
               </div>
               <p class="text-cream-200 text-xs leading-relaxed">
-                Hello! I am your SME credit and liquidity risk copilot. Every decision I produce is grounded in real node relationships, payment audits, and contact topologies stored in your FalkorDB knowledge graph.
+                LedgerGraph is initialized and connected to FalkorDB. Every assessment is grounded in verified graph relationships, multi-hop payment audits, and contact-sharing fraud topologies.
               </p>
               <p class="text-cream-400 text-[11px]">
-                Type a question above or choose a suggested prompt to begin.
+                Enter a question or credit evaluation above to begin.
               </p>
             </div>
           </div>
@@ -598,7 +577,7 @@
               class="px-5 py-3.5 font-semibold border-b-2 border-teal-400 text-teal-300 flex items-center gap-2 whitespace-nowrap bg-teal-950/40 rounded-t-2xl transition-all"
             >
               <i data-lucide="layers" class="w-4 h-4"></i>
-              <span>Evidence Trail</span>
+              <span>Credit File</span>
             </button>
             <button
               onclick="switchTab('cypher')"
@@ -619,7 +598,7 @@
               class="px-5 py-3.5 font-medium border-b-2 border-transparent text-cream-300/60 hover:text-cream-100 flex items-center gap-2 whitespace-nowrap transition-all hover:bg-teal-950/20"
             >
               <i data-lucide="history" class="w-4 h-4"></i>
-              <span>Graph Memory</span>
+              <span>Ledger Memory</span>
             </button>
             <button
               onclick="switchTab('tasks')"
@@ -743,8 +722,8 @@
               <!-- Memories Section -->
               <div class="space-y-2.5">
                 <div class="flex items-center justify-between">
-                  <span class="font-bold text-purple-300 text-xs flex items-center gap-2">
-                    <i data-lucide="brain" class="w-4 h-4 text-purple-400"></i>
+                  <span class="font-bold text-teal-300 text-xs flex items-center gap-2">
+                    <i data-lucide="database" class="w-4 h-4 text-teal-400"></i>
                     <span>Long-Term Graph Memories (:AgentMemory)</span>
                   </span>
                   <button
@@ -801,12 +780,12 @@
       </div>
     </main>
 
-    <!-- Floating Minimalist Footer (Apple Design Style) -->
+    <!-- Minimalist Apple Footer -->
     <footer
       class="border-t border-teal-500/15 bg-[#03100e]/90 backdrop-blur-2xl py-4 px-6 text-center text-xs text-cream-400/80 z-20 mt-auto"
     >
-      <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-        <span>LedgerGraph • Built for the <strong class="text-cream-100">Graph Hacks: Context for AI Agents</strong> Hackathon</span>
+      <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+        <span>LedgerGraph • Trade Credit &amp; Receivables Ledger</span>
         <span class="text-teal-400/90 font-medium flex items-center gap-1.5">
           <span class="w-1.5 h-1.5 rounded-full bg-teal-400"></span>
           Powered by FalkorDB Graph Database
@@ -967,7 +946,7 @@
       >
         <div class="flex items-center justify-between pb-3.5 border-b border-teal-500/20">
           <h3 class="text-sm font-bold text-cream-50 flex items-center gap-2">
-            <i data-lucide="brain" class="w-4 h-4 text-purple-400"></i>
+            <i data-lucide="database" class="w-4 h-4 text-teal-400"></i>
             <span>Add Graph Memory (:AgentMemory)</span>
           </h3>
           <button onclick="closeModal('memory-modal')" class="text-cream-400 hover:text-white transition">
