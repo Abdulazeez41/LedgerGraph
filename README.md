@@ -1,32 +1,31 @@
-# LedgerGraph - SME Credit & Working Capital Copilot
+# LedgerGraph — Autonomous Trade Credit & Cash-Flow Agent
 
-> **Graph-grounded AI agent underwriting trade credit, uncovering contact-sharing fraud contagion, and protecting working capital in developing & frontier markets powered by FalkorDB.**
+> **Graph-grounded autonomous agent underwriting trade credit, uncovering contact-sharing delinquent syndicates, and protecting working capital in developing & frontier markets powered by FalkorDB.**
 
 [![FalkorDB](https://img.shields.io/badge/Graph_Database-FalkorDB-EC4899?style=for-the-badge&logo=redis&logoColor=white)](https://falkordb.com/)
 [![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
-[![Python 3.10+](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org/)
+[![React 18](https://img.shields.io/badge/Frontend-React_18_--_Three.js-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.2+-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
 
-<br>
+---
 
-**LedgerGraph** is an autonomous AI agent for suppliers and SMEs in developing and frontier markets that traverses multi-hop trade credit topologies in **FalkorDB** to approve customer credit, detect hidden contact-sharing delinquent networks, protect working capital, and remember decisions across sessions with 100% Cypher traceability.
+## The Problem: The Zero-Bureau Void in Frontier Markets
 
-## The Problem: Missing Credit Bureaus in Developing & Frontier Markets
+In developed economies, commercial credit is underwritten through centralized credit bureaus (Dun & Bradstreet, Experian, FICO). In **developing and frontier economy trade hubs**:
 
-In developed economies, trade credit is underwritten through centralized credit bureaus (FICO, Experian, Dun & Bradstreet). But in **underdeveloped, emerging, and frontier community trade networks**:
+1. **Zero Formal Bureau Coverage**: Over 80% of commercial micro-enterprises, regional distributors, and contractors operate completely off-bureau. Centralized credit scoring does not exist.
+2. **Informal Trade Credit is the Real Banking System**: More than 70% of B2B commerce runs on supplier net-30 terms. Building-material distributors, FMCG wholesalers, and hardware merchants are forced to act as uncollateralized lenders. Over 60% of SME insolvencies stem directly from overdue receivables locking up working capital.
+3. **The "Phoenix Company" Contagion Ring**: Serial defaulters regularly abandon debts under one registered entity and quietly reopen under a new name or sibling alias—while sharing the exact same warehouse yard, delivery phone number, or commercial email. Relational SQL databases struggle with recursive multi-hop joins, and vector databases hallucinate text matches without structural guarantees.
+4. **Session Amnesia & Lost Covenants**: Trade credit agreements and dispute resolutions are negotiated verbally or across chat apps. Business owners forget prior dispute settlements (e.g., _"Require 30% advance deposit on orders above ₦1,000,000 due to past damaged goods dispute"_), repeatedly falling into the same traps.
 
-1. **The "Zero Bureau" Void**: Over 80% of commercial micro-enterprises, regional distributors, and contractors operate with **zero formal credit bureau coverage**. Centralized credit scores simply do not exist.
-2. **Informal Trade Credit is the Real Banking System**: More than 70% of B2B commerce occurs on supplier net-30 terms. Distributors and building suppliers are forced to act as uncollateralized banks. Over 60% of SME failures stem directly from unpaid trade debt locking up working capital.
-3. **The "Phoenix Company" Contagion Ring**: Serial defaulters regularly abandon debts under one business registration and quietly reopen under a new name or sibling alias-while sharing the exact same warehouse yard, delivery phone, or commercial email. Tabular accounting tools and vector similarity databases treat them as brand-new, clean applicants.
-4. **Session Amnesia & Lost Covenants**: Supplier credit decisions are scattered across informal conversations. Business owners forget prior dispute settlements (e.g., _"Require 30% advance deposit on orders above $10k due to prior damaged goods dispute"_), repeatedly exposing themselves to repeat defaults.
+---
 
-<br>
-
-## Why FalkorDB Solves This Problem
+## Why FalkorDB Solves This
 
 When credit bureaus don't exist, **the network graph topology is the only reliable ground truth**.
 
-Traditional relational SQL databases struggle with expensive multi-table recursive joins, and vector databases hallucinate text matches without structural guarantees. **LedgerGraph puts FalkorDB at the dead center of the agent's cognition**:
+**LedgerGraph puts FalkorDB at the center of the agent's cognition**:
 
 ```
                               ┌─────────────────────────────────────────────────────────┐
@@ -35,7 +34,7 @@ Traditional relational SQL databases struggle with expensive multi-table recursi
    (:Customer {name}) ───────►│  (:Customer)-[:PLACED]->(:Order)-[:HAS_INVOICE]->(:Inv) │
           │                   │    │                       │             │              │
           ▼                   │    ▼ (buys_from)           ▼ (contains)  ▼ (has_dispute)│
-   [Agent Intent]             │  (:Supplier)             (:Product)    (:Dispute)       │
+   [Agent Inquiry]            │  (:Supplier)             (:Product)    (:Dispute)       │
           │                   │                                          │              │
           ▼                   │  (:Customer)-[:SHARES_CONTACT]->(:Customer [DELINQUENT])│
   Multi-Hop Cypher            │                                                         │
@@ -45,7 +44,7 @@ Traditional relational SQL databases struggle with expensive multi-table recursi
           │                                                │
           ▼                                                ▼
   [Risk Engine + LLM] ──────────────────────────► [100% Traceable Decision,
-                                                   Graph Visualizer & Memory Write-back]
+                                                   3D Visualizer & Memory Write-back]
 ```
 
 1. **Deterministic Multi-Hop Traversal**:
@@ -58,26 +57,49 @@ Traditional relational SQL databases struggle with expensive multi-table recursi
 4. **Zero-Hallucination Evidence Trail**:
    Every recommendation is backed by real FalkorDB node IDs, relationship paths, and raw Cypher queries executed live and displayed directly on the dashboard.
 
-<br>
+---
+
+## Visual Concept: "The Ledger Room, in Glass"
+
+The workspace is designed as a physical working desk for a business owner reading accounts daily:
+
+- **Dark Stage**: Ink green-black (`#0B1210`) with faint SVG film grain texture (4–6% opacity).
+- **Physical 3D Constellation**: Nodes float in space with distinct 3D geometry silhouettes:
+  - `Customer`: **Octahedron** (color-coded by risk: Naira green `≤35`, Brass `36–65`, Vermilion `>65`)
+  - `Invoice`: **Cube** (Vermilion overdue, Green paid, Brass pending)
+  - `Order`: **Hexagonal Cylinder**
+  - `Payment`: **Torus / Ring** (Emerald)
+  - `Dispute`: **Tetrahedron** (Sharp Vermilion / Amber)
+  - `Supplier`: **Sphere**
+- **Sequential Evidence Illumination**: When the agent explains a recommendation, the exact graph path it traversed lights up in brass edge-by-edge while the rest of the constellation dims.
+- **Solid Bone Paper Surfaces**: Dense financial dossiers, audit trails, and trade history sit on warm bone paper (`#EEE8DA`) with crisp ink typography (`#1A2420`).
+- **Stamped Fraunces Verdicts**: Stamped physical typography for `APPROVE`, `APPROVE WITH CONDITIONS`, `HOLD`, `ESCALATE`, and `CHASE PAYMENT`.
+- **Pure React Cypher Inspection**: Interactive query inspector tokenizes Cypher queries without `dangerouslySetInnerHTML`.
+- **Single Locale Config**: Currency, locale, and date formatting are centralized in one config file ([`frontend/src/config/locale.ts`](file:///home/abdulazeez/github/LedgerGraph/frontend/src/config/locale.ts), default `NGN`, `en-NG`, formatted via `Intl.NumberFormat` and `Intl.DateTimeFormat`).
+
+---
 
 ## System Architecture
 
 ```
  ┌────────────────────────────────────────────────────────────────────────┐
- │                 LEDGERGRAPH SINGLE-PAGE DASHBOARD                      │
- │   • Interactive Force-Directed Subgraph Explorer (Vis.js Network)      │
- │   • Copilot Terminal with Real-Time Reasoning Stream & Sample Prompts  │
- │   • Recommendation Badge, Risk Gauge, & Conditions Checklist           │
- │   • Tabbed Evidence Center: Profile, Live Cypher, Memory, Tasks        │
+ │                    THE LEDGER ROOM (REACT 18 + TS)                     │
+ │   • 3D Constellation: Three.js (@react-three/fiber, drei, d3-force-3d) │
+ │   • Floating Glass Instruments: LedgerStrip, TheBook Rail, QuestionBar │
+ │   • Slide-In Dossier: Fraunces Verdicts, Evidence Markers [e1], Cypher │
+ │   • 2D SVG Fallback: Automatic graceful degradation for low-power GPUs │
  └───────────────────────────────────┬────────────────────────────────────┘
-                                     │ HTTP / REST / JSON
+                                     │ HTTP / REST / JSON (Vite Proxy in Dev)
                                      ▼
  ┌────────────────────────────────────────────────────────────────────────┐
  │                         FASTAPI BACKEND                                │
- │   • /api/chat                       • /api/customers                   │
- │   • /api/customers/{id}/profile     • /api/customers/{id}/subgraph     │
- │   • /api/actions/override           • /api/actions/task                │
- │   • /api/actions/memory             • /api/actions/reminder            │
+ │   • /api/health                     • /api/customers                   │
+ │   • /api/customers/{name}/profile   • /api/customers/{name}/subgraph   │
+ │   • /api/customers/{name}/history   • /api/customers/{name}/connected  │
+ │   • /api/customers/{name}/decisions • /api/chat                        │
+ │   • /api/actions/override           • /api/actions/reminder            │
+ │   • /api/actions/task               • /api/actions/memory              │
+ │   • /api/upload-csv                 • /api/seed                        │
  └─────────────────┬───────────────────────────────────┬──────────────────┘
                    │                                   │
                    ▼                                   ▼
@@ -94,13 +116,13 @@ Traditional relational SQL databases struggle with expensive multi-table recursi
  ┌────────────────────────────────────────────────────────────────────────┐
  │                      FALKORDB GRAPH DATABASE                           │
  │  Nodes: Customer, Order, Invoice, Payment, Dispute, Supplier, Product  │
- │         AgentDecision, AgentMemory, AgentTask                          │
- │  Edges: PLACED, HAS_INVOICE, PAID_BY, HAS_DISPUTE, SHARES_CONTACT     │
- │         BUYS_FROM, SUPPLIES, OWES, ABOUT, BASED_ON, FOR_CUSTOMER       │
+ │         AgentDecision, AgentMemory, FollowUpTask                       │
+ │  Edges: PLACED, HAS_INVOICE, RECORDED_PAYMENT, FILED_DISPUTE           │
+ │         SUPPLIES, BUYS_FROM, CONNECTED_TO, PREVIOUS_DECISION           │
  └────────────────────────────────────────────────────────────────────────┘
 ```
 
-<br>
+---
 
 ## Graph Data Model
 
@@ -117,41 +139,40 @@ Traditional relational SQL databases struggle with expensive multi-table recursi
 | `(:Product)`       | `id, name, category, unit_price, stock_quantity`                                       | Inventory catalog items                                 |
 | `(:AgentDecision)` | `id, question, recommendation, confidence, rationale, outcome, user_feedback`          | Persistent agent recommendations stored in graph        |
 | `(:AgentMemory)`   | `id, memory_type, content, importance, created_at`                                     | Long-term episodic and semantic memory                  |
-| `(:AgentTask)`     | `id, title, description, status, due_date, created_at`                                 | Concrete operational follow-up tasks                    |
+| `(:FollowUpTask)`  | `id, title, description, status, due_date, created_at`                                 | Concrete operational follow-up tasks                    |
 
 ### Relationships
 
 - `(:Customer)-[:PLACED]->(:Order)`
 - `(:Order)-[:CONTAINS]->(:Product)`
 - `(:Order)-[:HAS_INVOICE]->(:Invoice)`
-- `(:Customer)-[:OWES]->(:Invoice)`
-- `(:Invoice)-[:PAID_BY]->(:Payment)`
-- `(:Invoice)-[:HAS_DISPUTE]->(:Dispute)`
-- `(:Customer)-[:SHARES_CONTACT]->(:Customer)` _(Shared phone, email, or physical warehouse stall)_
+- `(:Invoice)-[:RECORDED_PAYMENT]->(:Payment)`
+- `(:Invoice)-[:FILED_DISPUTE]->(:Dispute)`
+- `(:Customer)-[:CONNECTED_TO]->(:Customer)` _(Shared phone, email, or physical address)_
 - `(:Customer)-[:BUYS_FROM]->(:Supplier)`
 - `(:Supplier)-[:SUPPLIES]->(:Product)`
 - `(:AgentDecision)-[:ABOUT]->(:Customer)`
 - `(:AgentDecision)-[:BASED_ON]->(:Invoice|:Payment|:Dispute|:Customer)`
-- `(:AgentMemory)-[:ABOUT]->(:Customer)`
-- `(:AgentTask)-[:FOR_CUSTOMER]->(:Customer)`
+- `(:AgentMemory)-[:HAS_MEMORY]->(:Customer)`
+- `(:FollowUpTask)-[:TASK_FOR]->(:Customer)`
 
-<br>
+---
 
-## Required Agent Tools
+## Agent Tooling (Cypher-Grounded)
 
 All 9 agent tools execute real Cypher queries against FalkorDB and return structured JSON:
 
-| Tool Name                                  | Cypher Purpose                                                                        | Return Payload                                               |
-| :----------------------------------------- | :------------------------------------------------------------------------------------ | :----------------------------------------------------------- |
-| `get_customer_profile(name)`               | Aggregates orders, invoice balances, total paid, overdue amounts, and active disputes | Customer financial metrics & credit limit                    |
-| `get_payment_history(name)`                | Traverses multi-hop invoices, settlements, and payment timeliness                     | List of all invoices with status, days overdue, and payments |
-| `find_connected_risk(name)`                | Multi-hop search over `[:SHARES_CONTACT]` to identify delinquent sister entities      | Connected customers, shared contact type, overdue totals     |
-| `get_supplier_exposure(name)`              | Traverses `[:BUYS_FROM]` and `[:SUPPLIES]` to inspect product dependencies            | Products, supplier names, stock levels, lead times           |
-| `calculate_cash_flow_impact(name, amount)` | Computes projected credit utilization and working capital locked                      | Overdue balance, projected exposure, risk level              |
-| `save_agent_decision(...)`                 | Creates `(:AgentDecision)` and links `[:ABOUT]` customer and `[:BASED_ON]` evidence   | Saved decision ID and relationship confirmation              |
-| `save_agent_memory(...)`                   | Persists `(:AgentMemory)` (POLICY, FACT, PREFERENCE, OUTCOME) linked to customer      | Saved memory ID                                              |
-| `create_follow_up_task(...)`               | Creates actionable `(:AgentTask)` linked via `[:FOR_CUSTOMER]`                        | Created task ID, due date, status                            |
-| `get_previous_decisions(name)`             | Queries prior decisions, graph memories, and tasks for cross-session continuity       | Complete historical context & prior covenants                |
+| Tool Name                                  | Cypher Purpose                                                                           | Return Payload                                               |
+| :----------------------------------------- | :--------------------------------------------------------------------------------------- | :----------------------------------------------------------- |
+| `get_customer_profile(name)`               | Aggregates orders, invoice balances, total paid, overdue amounts, and active disputes    | Customer financial metrics & credit limit                    |
+| `get_payment_history(name)`                | Traverses multi-hop invoices, settlements, and payment timeliness                        | List of all invoices with status, days overdue, and payments |
+| `find_connected_risk(name)`                | Multi-hop search over `[:CONNECTED_TO]` to identify delinquent sister entities           | Connected customers, shared contact type, overdue totals     |
+| `get_supplier_exposure(name)`              | Traverses `[:BUYS_FROM]` and `[:SUPPLIES]` to inspect product dependencies               | Products, supplier names, stock levels, lead times           |
+| `calculate_cash_flow_impact(name, amount)` | Computes projected credit utilization and working capital locked                         | Overdue balance, projected exposure, risk level              |
+| `save_agent_decision(...)`                 | Creates `(:AgentDecision)` and links `[:ABOUT]` customer and `[:BASED_ON]` evidence      | Saved decision ID and relationship confirmation              |
+| `save_agent_memory(...)`                   | Persists `(:AgentMemory)` (`POLICY`, `FACT`, `PREFERENCE`, `OUTCOME`) linked to customer | Saved memory ID                                              |
+| `create_follow_up_task(...)`               | Creates actionable `(:FollowUpTask)` linked via `[:TASK_FOR]`                            | Created task ID, due date, status                            |
+| `get_previous_decisions(name)`             | Queries prior decisions, graph memories, and tasks for cross-session continuity          | Complete historical context & prior covenants                |
 
 ---
 
@@ -159,19 +180,19 @@ All 9 agent tools execute real Cypher queries against FalkorDB and return struct
 
 ### 1. Credit Approval with Contact-Sharing Contagion Detection
 
-**User Prompt:**
+**Owner Inquiry:**
 
-> _“Should I approve a $20,000 order for BrightMart on 30-day credit?”_
+> _“Should I approve a ₦20,000 order for BrightMart on 30-day credit?”_
 
-**Agent Recommendation:** `ESCALATE` (Confidence: 92% • Risk Score: 69/100)
+**The Agent Recommendation:** `ESCALATE` (Confidence: 92% • Risk Score: 69/100)  
 **Business Explanation:**
 
 > **Recommendation: ESCALATE TO CREDIT COMMITTEE** (Risk Score: 69/100)  
-> High-priority alert on **BrightMart Hardware Ltd**. Graph network analysis uncovered direct contact sharing with known delinquent entities:
-> • Shares Phone (`+1-555-019-2831`) and Address (`Plot 442, Industrial Area, Trade Hub Zone 1`) with delinquent entity **Metro Commercial Ventures** carrying **$50,000.00** in defaulted/overdue debt across 2 invoices.  
-> • BrightMart currently has 1 overdue invoice `INV-2026-0003` ($12,000.00, 33 days overdue) under an open dispute regarding damaged packaging.  
-> • Extending an additional $20,000.00 would bring total exposure to $47,000.00 (78% of their $60,000.00 credit ceiling).  
-> • **Graph Memory (POLICY)**: Owner directive states: _"BrightMart has a connected entity (Metro Commercial) with delinquent overdue invoices. Require at least 30% advance deposit for orders above $10,000 until INV-103 dispute is cleared."_
+> High-priority alert on **BrightMart Hardware Ltd**. Graph network analysis uncovered direct contact sharing with known delinquent entities:  
+> • Shares Phone (`+1-555-019-2831`) and Address (`Plot 442, Industrial Area, Trade Hub Zone 1`) with delinquent sister entity **Metro Commercial Ventures** carrying **₦50,000.00** in defaulted debt across 2 invoices.  
+> • BrightMart currently has 1 overdue invoice `INV-2026-0003` (₦12,000.00, 33 days overdue) under an open dispute regarding damaged packaging.  
+> • Extending an additional ₦20,000.00 would bring total exposure to ₦47,000.00 (78% of their credit limit).  
+> • **Graph Memory (POLICY)**: Owner directive states: _"BrightMart has a connected entity (Metro Commercial) with delinquent overdue invoices. Require at least 30% advance deposit for orders above ₦10,000 until INV-103 dispute is cleared."_
 >
 > This topological pattern indicates potential phoenix entity restructuring across affiliated entities in the commercial trade corridor. Do not fulfill on open credit without personal corporate director guarantees.
 >
@@ -181,40 +202,40 @@ All 9 agent tools execute real Cypher queries against FalkorDB and return struct
 
 ### 2. Cross-Session Graph Memory Recall
 
-**User Prompt:**
+**Owner Inquiry:**
 
 > _“What did we decide about BrightMart last time?”_
 
-**Agent Response:**
+**The Agent Response:**
 
 > **Historical Records for BrightMart Hardware Ltd:**  
-> **Last Decision:**
-> • Question: _"Should I approve a $20,000 order for BrightMart on 30-day credit?"_  
+> **Last Decision:**  
+> • Inquiry: _"Should I approve a ₦20,000 order for BrightMart on 30-day credit?"_  
 > • Recommendation: **ESCALATE** (Confidence: 92%)  
-> • Rationale: Identified contact sharing with delinquent entity Metro Commercial Ventures ($50k overdue), plus active dispute on INV-2026-0003.
+> • Rationale: Identified contact sharing with delinquent entity Metro Commercial Ventures (₦50,000 overdue), plus active dispute on INV-2026-0003.
 >
 > **Saved Graph Memories:**  
-> • `[POLICY]` Business owner directive: _"BrightMart has a connected entity (Metro Commercial) with delinquent overdue invoices. Require at least 30% advance deposit for orders above $10,000 until INV-103 dispute is cleared."_ _(Importance: 9/10)_  
+> • `[POLICY]` Business owner directive: _"BrightMart has a connected entity (Metro Commercial) with delinquent overdue invoices. Require at least 30% advance deposit for orders above ₦10,000 until INV-103 dispute is cleared."_ _(Importance: 9/10)_  
 > • `[PREFERENCE]` Customer prefers direct wire transfer settlements and requests digital receipts via WhatsApp / Email. _(Importance: 7/10)_
 >
 > **Open Follow-up Tasks:**  
-> • **Resolve cement damage dispute on INV-103 with BrightMart** (Status: `PENDING`, Due: 2026-10-22) - Dispatch site inspector to verify 40 damaged cement bags at BrightMart Sector 4 warehouse and issue credit note so remaining balance can be collected.
+> • **Resolve cement damage dispute on INV-103 with BrightMart** (Status: `PENDING`) — Dispatch site inspector to verify 40 damaged cement bags at BrightMart Sector 4 warehouse and issue credit note so remaining balance can be collected.
 
 ---
 
 ### 3. Portfolio-Level Debt Chasing & Working Capital Recovery
 
-**User Prompt:**
+**Owner Inquiry:**
 
 > _“Which invoices should I chase today?”_
 
-**Agent Response:**
+**The Agent Response:**
 
-> You have **8 priority overdue invoices** totaling **$187,000.00** requiring immediate chase:  
-> • **Horizon Aggregate Supplies** - Invoice `INV-2026-0013` for **$21,000.00** (78 days overdue)  
-> • **Metro Commercial Ventures** - Invoice `INV-2026-0007` for **$28,000.00** (38 days overdue)  
-> • **FastTrack Construction Ltd** - Invoice `INV-2026-0036` for **$25,000.00** (29 days overdue)  
-> ...  
+> You have **8 priority overdue invoices** totaling **₦187,000.00** requiring immediate chase:  
+> • **Horizon Aggregate Supplies** — Invoice `INV-2026-0013` for **₦21,000.00** (78 days overdue)  
+> • **Metro Commercial Ventures** — Invoice `INV-2026-0007` for **₦28,000.00** (38 days overdue)  
+> • **FastTrack Construction Ltd** — Invoice `INV-2026-0036` for **₦25,000.00** (29 days overdue)
+>
 > **Proposed Action**: Draft payment reminder for Horizon Aggregate Supplies (INV-2026-0013).
 
 ---
@@ -224,99 +245,61 @@ All 9 agent tools execute real Cypher queries against FalkorDB and return struct
 ### Prerequisites
 
 - Python 3.10+
+- Node.js 18+ & npm
 - Docker
 
-### 1. Clone & Set Up Environment
+### 1. Run FalkorDB via Docker
 
-```bash
-git clone https://github.com/your-username/LedgerGraph.git
-cd LedgerGraph
-
-# Create virtual environment
-python3 -m venv .venv
-source .venv/bin/activate
-
-# Install dependencies
-pip install -r requirements.txt
-```
-
-### 2. Run FalkorDB via Docker
-
-LedgerGraph automatically connects to FalkorDB on port `6380` (or `6379`):
+LedgerGraph connects to FalkorDB on port `6380` (or `6379`):
 
 ```bash
 docker pull falkordb/falkordb:latest
 docker run -d --name ledgergraph-falkordb -p 6380:6379 falkordb/falkordb:latest
 ```
 
-_(Alternatively, use `docker compose up -d`)_
-
-### 3. Seed Demo Dataset
-
-Generate and ingest the 20-customer commercial trade network (284 nodes, 518 edges):
+### 2. Set Up Python Backend
 
 ```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+
+# Seed the commercial trade graph (300+ nodes, 800+ edges)
 python -m backend.db.seed_data
 ```
 
-### 4. Configure Environment Variables (Optional for LLM)
+### 3. Build & Run Frontend
+
+The frontend is built with Vite + React 18 + TypeScript:
 
 ```bash
-cp .env.example .env
+cd frontend
+npm install
+npm run build
 ```
 
-> **Note on Zero-API-Key Operation**: LedgerGraph includes an intelligent, deterministic graph reasoning engine that operates **100% offline without any API key**. If you configure `OPENAI_API_KEY` in `.env`, the agent seamlessly utilizes OpenAI models while maintaining the exact same Cypher evidence grounding.
+The production assets compile directly into `frontend/dist`. FastAPI is configured to serve them statically at the root URL.
 
-### 5. Launch LedgerGraph
+#### Running in Development:
 
 ```bash
+# Terminal 1: Backend
 python -m uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
+
+# Terminal 2: Frontend with Hot Module Replacement & Proxy
+cd frontend
+npm run dev
+# Accessible at http://localhost:5173
+```
+
+#### Running in Production / Standalone:
+
+```bash
+python -m uvicorn backend.main:app --host 0.0.0.0 --port 8000
 ```
 
 Open your browser at:  
 👉 **`http://localhost:8000`**
-
----
-
-## 3-Minute Demo Walkthrough for Judges
-
-1. **Dashboard Overview (`http://localhost:8000`)**:
-   - Check the top bar: FalkorDB is connected and reports **280+ nodes and 500+ edges**.
-   - Notice the Vis.js interactive graph canvas on the right side.
-2. **Execute Multi-Hop Credit Evaluation**:
-   - Click the prompt chip: **`$20k Credit for BrightMart?`**
-   - Watch the copilot stream the graph traversal.
-   - The recommendation badge turns purple for **`ESCALATE`** (Risk score 69/100).
-   - In the graph canvas, drag nodes to explore the multi-hop relationship between BrightMart, its invoices, and its sister entity **Metro Commercial Ventures**.
-3. **Inspect the Cypher Queries**:
-   - Click the **"Cypher Queries Executed"** tab.
-   - Review the live queries: profile lookup, multi-hop payment traversal, connected risk query, and cash-flow impact calculation.
-4. **Verify Cross-Session Agent Memory**:
-   - Click the prompt chip: **`Memory: BrightMart History`**.
-   - Notice how the agent instantly pulls the prior decision, saved policy covenants (`[:AgentMemory]`), and pending inspection tasks (`[:AgentTask]`).
-5. **Take Operational Actions**:
-   - Click **"Payment Reminder"**: View the auto-formatted WhatsApp / SMS reminder with the customer's phone number, overdue amount, and reference details.
-   - Click **"Override Decision"**: Enter owner feedback (e.g., _"Approved because customer provided collateral"_) and submit. FalkorDB updates the decision node live.
-   - Click **"Create Task"**: Add an action item to the graph.
-6. **Portfolio-Level Intelligence**:
-   - Click **`Highest Risk Accounts`** to see top delinquent entities ranked by graph risk.
-   - Click **`Invoices to Chase`** to identify trapped working capital.
-   - Click **`Connected Risk Pairs`** to reveal all contact-sharing entity clusters across the network.
-
----
-
-## Hackathon Track Alignment: Track 01
-
-### Primary Track: **Track 01 - Context for AI Agents**
-
-- **Graph as the Agent's Cognitive Fabric**: The graph is not an auxiliary retrieval index; it is where the agent reasons. The agent dynamically dispatches Cypher queries, analyzes network topology, detects fraud contagion, and saves its conclusions back into the graph.
-- **Traceable Graph Paths**: Every single recommendation is accompanied by the exact multi-hop graph path and raw Cypher queries executed.
-- **Persistent Agent Memory Across Sessions**: Solves agent amnesia by persisting underwriting decisions and owner covenants into `(:AgentDecision)` and `(:AgentMemory)` nodes.
-
-### Supplementary Alignment:
-
-- **Track 02 (Cross-Domain Graph RAG)**: Connects operational supply chain data (suppliers, lead times, stock availability) with accounts receivables and commercial dispute tracking.
-- **Track 03 (Real-Time Knowledge Graph)**: Features real-time state mutation, CSV data ingestion, and interactive force-directed graph exploration.
 
 ---
 
