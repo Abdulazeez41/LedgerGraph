@@ -1,0 +1,21 @@
+id,name,phone,email,address,business_type,credit_limit,risk_score,created_at
+CUST-001,BrightMart Hardware Ltd,+1-800-555-0199,sales@brightmart-trade.com,"Plot 442, Industrial Free Zone, Sector 4",Retailer,50000,45,2025-01-10
+CUST-002,Metro Commercial Ventures,+1-800-555-0199,info@metroventures.com,"Plot 442, Industrial Free Zone, Sector 4",Contractor,30000,85,2025-02-14
+CUST-003,Apex Global Builders Ltd,+1-800-111-4455,procurement@apexgroup-global.com,"12 Commercial Boulevard, Financial District",Construction,150000,30,2024-11-01
+CUST-004,Horizon Aggregate Supplies,+1-800-777-3322,procurement@apexgroup-global.com,"Quarry Road, Sector 8 Logistics Hub",Trader,40000,78,2025-03-20
+CUST-005,Frontier InfraTech Ltd,+1-800-333-8811,projects@frontierinfratech.com,"Suite 104, Trade Towers, Central District",Infrastructure,120000,25,2024-08-15
+CUST-006,Crestline Heights Engineering,+1-800-333-8811,admin@crestlineheights.com,"Plot 78, Eastern Hills Development",Developer,80000,72,2025-04-12
+CUST-007,Valley Mechanics & Steel,+1-800-444-9900,info@valleysteel.com,"Shed 14, Regional Wholesale Market",Wholesaler,60000,40,2025-02-01
+CUST-008,Summit Hardware Merchants,+1-800-666-2211,summithardware@trade.com,"Shed 14, Regional Wholesale Market",Retailer,25000,80,2025-05-18
+CUST-009,Pioneer Builders Hub,+1-800-888-1234,accounts@fasttrack-builders.com,"4 Expressway Junction, North Corridor",Cooperative,35000,65,2025-06-05
+CUST-010,FastTrack Construction Ltd,+1-800-999-5678,accounts@fasttrack-builders.com,"Sector F, Airport Logistics Area",Residential Builder,70000,75,2025-01-28
+CUST-011,Prime Continental Structures,+1-800-123-4567,info@primecontinental.com,"8 Embassy Crescent, Capital District",Luxury Developer,250000,15,2024-05-10
+CUST-012,Continental Block Works,+1-800-987-6543,continentalblocks@trade.com,"Industrial Area 10, East Zone",Manufacturer,45000,20,2024-09-12
+CUST-013,Modern Luxury Interiors,+1-800-345-6789,hello@moderninteriors.com,"Commercial Avenue, Uptown Axis",Interior Contractor,50000,35,2025-03-01
+CUST-014,Central Materials Depot,+1-800-456-7890,centralmaterials@trade.com,Central Municipal Market,Merchant,30000,50,2025-04-15
+CUST-015,Metro Modern Homes,+1-800-678-9012,contact@metromodern.com,"Phase 4, Suburban Corridor",Residential Contractor,65000,30,2024-12-05
+CUST-016,Pacific Prime Developments,+1-800-567-8901,tenders@pacificprime.com,"Nelson Street, Commercial Zone",Commercial Contractor,200000,18,2024-06-20
+CUST-017,Civil Infrastructure Contractors,+1-800-112-2334,info@civilinfra.com,"Plot 102, Central Trade District",Civil Engineering,180000,22,2024-07-08
+CUST-018,Capital Ceramics & Allied,+1-800-223-3445,orders@capitalceramics.com,"Transit Road, Port Logistics Area",Retailer,55000,38,2025-02-22
+CUST-019,Delta Timber & Concrete,+1-800-334-4556,info@deltatimber.com,"Wholesale Timber Yard, West Dock",Timber & Concrete,40000,60,2025-05-02
+CUST-020,Alliance Civil Works,+1-800-445-5667,alliancecivil@trade.com,"Engineering Junction, Highway Hub",Infrastructure,75000,42,2025-03-14

@@ -1,0 +1,17 @@
+id,name,category,unit_price,stock_quantity,supplier_id
+PROD-001,Portland Commercial Cement 50kg,Cement,8.5,1400,SUPP-001
+PROD-002,High-Strength 42.5R Cement 50kg,Cement,9.2,950,SUPP-001
+PROD-003,Pozzolanic Hydraulic Cement 50kg,Cement,8.2,750,SUPP-002
+PROD-004,High-Yield TMT Rebar 12mm (Length),Steel,14.5,500,SUPP-003
+PROD-005,High-Yield TMT Rebar 16mm (Length),Steel,25.0,380,SUPP-003
+PROD-006,High-Yield TMT Rebar 10mm (Length),Steel,9.8,620,SUPP-003
+PROD-007,Mild Steel Binding Wire (Roll),Steel,32.0,90,SUPP-003
+PROD-008,Fiber-Cement Corrugated Roofing Sheet 2.4m,Roofing,11.5,300,SUPP-004
+PROD-009,Long-Span Aluminium Step-Tile 0.55mm,Roofing,4.8,1800,SUPP-004
+PROD-010,Polished Porcelain Floor Tiles 60x60 (Ctn),Flooring,13.5,450,SUPP-006
+PROD-011,Glazed Ceramic Wall Tiles 30x60 (Ctn),Flooring,9.5,400,SUPP-006
+PROD-012,Commercial Dual-Flush Sanitary Set,Sanitary,78.0,60,SUPP-006
+PROD-013,2.5mm Single Core Copper Cable (100m),Electrical,42.0,120,SUPP-005
+PROD-014,4.0mm Single Core Copper Cable (100m),Electrical,68.0,85,SUPP-005
+PROD-015,Heavy Duty PVC Pressure Pipe 4-inch (Length),Plumbing,12.0,220,SUPP-005
+PROD-016,Crushed Granite Aggregate 3/4-inch (20-Tonne Tipper),Aggregate,380.0,30,SUPP-002

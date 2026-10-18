@@ -1,0 +1,10 @@
+id,invoice_id,reason,opened_date,status,severity
+DISP-001,INV-003,Damaged cement bags during stormy delivery transit,2026-08-27,OPEN,MEDIUM
+DISP-002,INV-013,Substandard rebar tensile strength report,2026-07-12,OPEN,HIGH
+DISP-003,INV-025,Delayed warehouse offloading demurrage claimed,2026-08-08,OPEN,LOW
+DISP-004,INV-029,Freight demurrage dispute,2026-08-18,OPEN,MEDIUM
+DISP-005,INV-033,Batch weight discrepancies on cement load,2026-08-06,OPEN,MEDIUM
+DISP-006,INV-052,Damaged PVC pipes in transit,2026-07-31,OPEN,MEDIUM
+DISP-007,INV-069,Chipped corner tiles during transit,2026-07-22,RESOLVED,LOW
+DISP-008,INV-073,Mismatched roofing profile delivered,2026-08-10,OPEN,HIGH
+DISP-009,INV-077,Short delivery by 2 tonnes on aggregate tipper,2026-08-10,RESOLVED,MEDIUM

@@ -1,0 +1,1154 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LedgerGraph - SME Credit & Cash-Flow Copilot</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              darkbg: "#0B0F17",
+              cardbg: "#111827",
+              sidebar: "#0F172A",
+              accent: "#3B82F6",
+              accenthover: "#2563EB",
+              falkor: "#EC4899",
+            },
+          },
+        },
+      };
+    </script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Vis.js Network for interactive graph rendering -->
+    <script
+      type="text/javascript"
+      src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"
+    ></script>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body
+    class="bg-darkbg text-slate-100 min-h-screen flex flex-col antialiased selection:bg-blue-600 selection:text-white"
+  >
+    <!-- Top Navigation Bar -->
+    <header
+      class="border-b border-slate-800 bg-slate-900/90 backdrop-blur-md sticky top-0 z-40 px-4 py-3"
+    >
+      <div
+        class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4"
+      >
+        <!-- Brand -->
+        <div class="flex items-center gap-3">
+          <div
+            class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-falkor flex items-center justify-center shadow-lg shadow-blue-500/20"
+          >
+            <i data-lucide="network" class="w-6 h-6 text-white"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span
+                class="text-xl font-bold tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent"
+              >
+                LedgerGraph
+              </span>
+              <span
+                class="text-xs px-2 py-0.5 rounded-full font-semibold bg-pink-500/10 text-pink-400 border border-pink-500/20"
+              >
+                FalkorDB Copilot
+              </span>
+            </div>
+            <p class="text-xs text-slate-400">
+              SME Credit & Working Capital Copilot • Developing & Frontier Trade Networks
+            </p>
+          </div>
+        </div>
+
+        <!-- FalkorDB Live Status & Actions -->
+        <div class="flex items-center gap-3">
+          <div
+            id="db-health-badge"
+            class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800/80 border border-slate-700/80 text-xs"
+          >
+            <span
+              class="w-2.5 h-2.5 rounded-full bg-emerald-500 pulse-dot"
+            ></span>
+            <span class="text-slate-300 font-medium" id="db-status-text"
+              >FalkorDB: Checking...</span
+            >
+          </div>
+
+          <button
+            onclick="openModal('upload-modal')"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs text-slate-200 transition"
+          >
+            <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+            <span>Upload CSV</span>
+          </button>
+
+          <button
+            onclick="triggerReseed()"
+            id="btn-reseed"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs text-slate-200 transition"
+          >
+            <i
+              data-lucide="refresh-cw"
+              class="w-3.5 h-3.5"
+              id="reseed-icon"
+            ></i>
+            <span>Reset Demo Graph</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Sub-header Quick Selection & Example Prompts -->
+    <div class="bg-slate-900/50 border-b border-slate-800/80 px-4 py-2.5">
+      <div
+        class="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-3"
+      >
+        <div class="flex items-center gap-2 w-full md:w-auto">
+          <span class="text-xs text-slate-400 font-medium whitespace-nowrap"
+            >Target Customer:</span
+          >
+          <select
+            id="customer-select"
+            onchange="onCustomerSelectChange()"
+            class="bg-slate-800 border border-slate-700 rounded-lg text-xs text-slate-200 px-3 py-1.5 focus:outline-none focus:border-blue-500 w-full md:w-64"
+          >
+            <option value="">-- Choose a Customer --</option>
+          </select>
+          <button
+            onclick="loadSelectedCustomerOverview()"
+            class="px-2.5 py-1.5 rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30 text-xs hover:bg-blue-600/30 transition whitespace-nowrap"
+          >
+            Inspect Graph
+          </button>
+        </div>
+
+        <!-- Quick Prompt Pills -->
+        <div
+          class="flex items-center gap-1.5 overflow-x-auto w-full md:w-auto pb-1 md:pb-0 text-xs"
+        >
+          <span class="text-slate-500 text-[11px] whitespace-nowrap mr-1"
+            >Sample Prompts:</span
+          >
+          <button
+            onclick="
+              usePrompt(
+                'Should I approve a $20,000 order for BrightMart on 30-day credit?',
+                20000,
+              )
+            "
+            class="px-2.5 py-1 rounded-md bg-slate-800/80 hover:bg-slate-700 border border-slate-700/60 text-slate-300 whitespace-nowrap transition"
+          >
+            $20k Credit for BrightMart?
+          </button>
+          <button
+            onclick="
+              usePrompt('What did we decide about BrightMart last time?')
+            "
+            class="px-2.5 py-1 rounded-md bg-slate-800/80 hover:bg-slate-700 border border-slate-700/60 text-slate-300 whitespace-nowrap transition"
+          >
+            Memory: BrightMart History
+          </button>
+          <button
+            onclick="
+              usePrompt('Which customers are highest credit risk this week?')
+            "
+            class="px-2.5 py-1 rounded-md bg-slate-800/80 hover:bg-slate-700 border border-slate-700/60 text-slate-300 whitespace-nowrap transition"
+          >
+            Highest Risk Accounts
+          </button>
+          <button
+            onclick="usePrompt('Which invoices should I chase today?')"
+            class="px-2.5 py-1 rounded-md bg-slate-800/80 hover:bg-slate-700 border border-slate-700/60 text-slate-300 whitespace-nowrap transition"
+          >
+            Invoices to Chase
+          </button>
+          <button
+            onclick="
+              usePrompt(
+                'Which customers are connected to other delinquent customers?',
+              )
+            "
+            class="px-2.5 py-1 rounded-md bg-slate-800/80 hover:bg-slate-700 border border-slate-700/60 text-slate-300 whitespace-nowrap transition"
+          >
+            Connected Risk Pairs
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Dashboard Container -->
+    <main
+      class="max-w-7xl mx-auto p-4 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-5 w-full"
+    >
+      <!-- LEFT COLUMN: Chat & Decision Engine (5 cols) -->
+      <section class="lg:col-span-5 flex flex-col gap-4">
+        <!-- Chat & Agent Query Box -->
+        <div
+          class="glass-panel rounded-xl p-4 flex flex-col h-[400px] shadow-xl"
+        >
+          <div
+            class="flex items-center justify-between pb-3 border-b border-slate-800 mb-2"
+          >
+            <div class="flex items-center gap-2">
+              <i data-lucide="bot" class="w-4 h-4 text-blue-400"></i>
+              <h2 class="text-sm font-semibold text-slate-200">
+                Graph Copilot Terminal
+              </h2>
+            </div>
+            <span
+              id="agent-thinking-badge"
+              class="hidden text-[11px] px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30 animate-pulse"
+            >
+              Querying FalkorDB...
+            </span>
+          </div>
+
+          <!-- Chat Messages Feed -->
+          <div
+            id="chat-messages"
+            class="flex-1 overflow-y-auto space-y-3 pr-1 text-xs"
+          >
+            <div
+              class="p-3 rounded-lg bg-slate-800/60 border border-slate-700/60 text-slate-300 space-y-1.5"
+            >
+              <div
+                class="flex items-center gap-1.5 font-semibold text-blue-400"
+              >
+                <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                <span>LedgerGraph Copilot Online</span>
+              </div>
+              <p class="text-slate-300 leading-relaxed">
+                Hello! I am your SME credit and cash-flow risk copilot,
+                reasoning directly over your FalkorDB knowledge graph.
+              </p>
+              <p class="text-slate-400 text-[11px]">
+                Ask me about customer credit approvals, large order fulfillment,
+                overdue debt recovery, or connected risk linkages.
+              </p>
+            </div>
+          </div>
+
+          <!-- Chat Input Form -->
+          <form
+            id="chat-form"
+            onsubmit="handleChatSubmit(event)"
+            class="pt-3 border-t border-slate-800/80 mt-2 space-y-2"
+          >
+            <div class="flex items-center gap-2">
+              <div class="relative flex-1">
+                <input
+                  type="text"
+                  id="chat-input"
+                  placeholder="Ask e.g. Should I approve $20k order for BrightMart?"
+                  class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500 pr-8"
+                />
+              </div>
+              <button
+                type="submit"
+                id="btn-send"
+                class="px-3.5 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium flex items-center gap-1 transition shadow-lg shadow-blue-600/20"
+              >
+                <span>Ask</span>
+                <i data-lucide="send" class="w-3 h-3"></i>
+              </button>
+            </div>
+            <div
+              class="flex items-center justify-between text-[11px] text-slate-400 px-1"
+            >
+              <div class="flex items-center gap-1.5">
+                <span>Order Amount ($):</span>
+                <input
+                  type="number"
+                  id="order-amount-input"
+                  placeholder="e.g. 20000"
+                  class="w-28 bg-slate-900 border border-slate-700 rounded px-2 py-0.5 text-[11px] text-slate-200 focus:outline-none focus:border-blue-500"
+                />
+              </div>
+              <span class="text-slate-500">Parameterized Cypher</span>
+            </div>
+          </form>
+        </div>
+
+        <!-- Recommendation Card -->
+        <div
+          id="recommendation-card"
+          class="glass-panel rounded-xl p-4 shadow-xl space-y-3.5"
+        >
+          <div class="flex items-center justify-between">
+            <h3
+              class="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5"
+            >
+              <i
+                data-lucide="shield-alert"
+                class="w-3.5 h-3.5 text-blue-400"
+              ></i>
+              <span>Copilot Recommendation</span>
+            </h3>
+            <div
+              id="rec-confidence-badge"
+              class="text-xs px-2.5 py-0.5 rounded-full bg-slate-800 border border-slate-700 text-slate-300 font-mono"
+            >
+              Confidence: --%
+            </div>
+          </div>
+
+          <!-- Big Badge & Risk Score -->
+          <div
+            class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3 rounded-lg bg-slate-900/80 border border-slate-800"
+          >
+            <div
+              id="recommendation-badge"
+              class="px-3.5 py-1.5 rounded-lg text-sm font-bold tracking-wide badge-approve flex items-center gap-2"
+            >
+              <i data-lucide="check-circle" class="w-4 h-4"></i>
+              <span id="recommendation-text">READY FOR EVALUATION</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="text-right">
+                <div class="text-[10px] text-slate-400 uppercase">
+                  Graph Risk Score
+                </div>
+                <div
+                  class="text-lg font-bold font-mono text-slate-200"
+                  id="risk-score-text"
+                >
+                  --/100
+                </div>
+              </div>
+              <div
+                class="w-10 h-10 rounded-full border-4 border-slate-700 flex items-center justify-center font-bold text-xs"
+                id="risk-circle"
+              >
+                --
+              </div>
+            </div>
+          </div>
+
+          <!-- Plain English Rationale -->
+          <div class="space-y-1.5">
+            <div
+              class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider"
+            >
+              Business Rationale
+            </div>
+            <div
+              id="rationale-text"
+              class="text-xs text-slate-300 bg-slate-900/60 p-3 rounded-lg border border-slate-800/80 leading-relaxed max-h-40 overflow-y-auto space-y-1"
+            >
+              Select a customer or ask a question to generate a graph-grounded
+              recommendation.
+            </div>
+          </div>
+
+          <!-- Recommended Conditions -->
+          <div id="conditions-container" class="space-y-1.5">
+            <div
+              class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider"
+            >
+              Recommended Conditions
+            </div>
+            <ul id="conditions-list" class="space-y-1 text-xs text-slate-300">
+              <li class="text-slate-500 italic text-[11px]">
+                No conditions formulated yet.
+              </li>
+            </ul>
+          </div>
+
+          <!-- Action Panel Buttons -->
+          <div class="pt-2 border-t border-slate-800 space-y-2">
+            <div
+              class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider flex items-center justify-between"
+            >
+              <span>Proposed Next Action</span>
+              <span
+                id="action-type-tag"
+                class="text-[10px] text-blue-400 font-mono"
+                >--</span
+              >
+            </div>
+            <div
+              id="action-summary-box"
+              class="p-2.5 rounded-lg bg-blue-950/20 border border-blue-900/40 text-xs text-blue-300 flex items-start gap-2"
+            >
+              <i
+                data-lucide="arrow-right-circle"
+                class="w-4 h-4 text-blue-400 mt-0.5 shrink-0"
+              ></i>
+              <span id="proposed-action-text"
+                >Ask a question to propose concrete operational actions.</span
+              >
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 pt-1">
+              <button
+                onclick="approveCurrentRecommendation()"
+                id="btn-approve-rec"
+                class="px-3 py-2 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 text-xs font-medium flex items-center justify-center gap-1.5 transition"
+              >
+                <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                <span>Approve Action</span>
+              </button>
+              <button
+                onclick="openOverrideModal()"
+                id="btn-override-rec"
+                class="px-3 py-2 rounded-lg bg-amber-600/20 hover:bg-amber-600/30 text-amber-400 border border-amber-500/30 text-xs font-medium flex items-center justify-center gap-1.5 transition"
+              >
+                <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                <span>Override Decision</span>
+              </button>
+              <button
+                onclick="openTaskModal()"
+                class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-medium flex items-center justify-center gap-1.5 transition"
+              >
+                <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
+                <span>Create Task</span>
+              </button>
+              <button
+                onclick="openReminderModal()"
+                id="btn-open-reminder"
+                class="px-3 py-2 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-400 border border-indigo-500/30 text-xs font-medium flex items-center justify-center gap-1.5 transition"
+              >
+                <i data-lucide="message-square" class="w-3.5 h-3.5"></i>
+                <span>Payment Reminder</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT COLUMN: Graph Visualizer & Evidence Center (7 cols) -->
+      <section class="lg:col-span-7 flex flex-col gap-4">
+        <!-- Interactive Graph Canvas Card -->
+        <div class="glass-panel rounded-xl p-4 shadow-xl flex flex-col">
+          <div
+            class="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-slate-800"
+          >
+            <div class="flex items-center gap-2">
+              <i data-lucide="share-2" class="w-4 h-4 text-pink-400"></i>
+              <h2 class="text-sm font-semibold text-slate-200">
+                FalkorDB Subgraph & Evidence Path
+              </h2>
+            </div>
+            <div class="flex items-center gap-2 text-xs">
+              <span
+                id="graph-stats-badge"
+                class="px-2 py-0.5 rounded bg-slate-800 text-slate-400 font-mono text-[11px]"
+              >
+                0 Nodes • 0 Edges
+              </span>
+              <button
+                onclick="fitGraphView()"
+                title="Fit View"
+                class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition"
+              >
+                <i data-lucide="maximize" class="w-3.5 h-3.5"></i>
+              </button>
+              <button
+                onclick="resetGraphPhysics()"
+                title="Stabilize Graph"
+                class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition"
+              >
+                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Vis.js Graph Canvas -->
+          <div class="relative mt-2">
+            <div id="graph-canvas"></div>
+            <div
+              id="graph-loading-overlay"
+              class="hidden absolute inset-0 bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center gap-2 text-xs text-slate-300"
+            >
+              <i
+                data-lucide="loader"
+                class="w-6 h-6 text-blue-400 animate-spin"
+              ></i>
+              <span>Rendering FalkorDB Cypher traversal...</span>
+            </div>
+          </div>
+
+          <!-- Interactive Legend -->
+          <div
+            class="flex flex-wrap items-center justify-between gap-2 pt-2.5 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400"
+          >
+            <div class="flex flex-wrap items-center gap-3">
+              <span class="flex items-center gap-1"
+                ><span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+                Customer</span
+              >
+              <span class="flex items-center gap-1"
+                ><span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+                Delinquent Link</span
+              >
+              <span class="flex items-center gap-1"
+                ><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                Invoice</span
+              >
+              <span class="flex items-center gap-1"
+                ><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                Payment</span
+              >
+              <span class="flex items-center gap-1"
+                ><span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+                Dispute</span
+              >
+              <span class="flex items-center gap-1"
+                ><span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span>
+                Supplier</span
+              >
+              <span class="flex items-center gap-1"
+                ><span class="w-2.5 h-2.5 rounded-full bg-teal-500"></span>
+                Product</span
+              >
+              <span class="flex items-center gap-1"
+                ><span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
+                Decision</span
+              >
+              <span class="flex items-center gap-1"
+                ><span class="w-2.5 h-2.5 rounded-full bg-yellow-500"></span>
+                Task</span
+              >
+            </div>
+            <span class="text-slate-500">Click any node to inspect</span>
+          </div>
+        </div>
+
+        <!-- Tabbed Evidence Center -->
+        <div
+          class="glass-panel rounded-xl flex flex-col shadow-xl flex-1 overflow-hidden"
+        >
+          <!-- Tab Headers -->
+          <div
+            class="flex items-center border-b border-slate-800 bg-slate-900/60 px-3 overflow-x-auto text-xs"
+          >
+            <button
+              onclick="switchTab('evidence')"
+              id="tab-btn-evidence"
+              class="px-3.5 py-2.5 font-medium border-b-2 border-blue-500 text-blue-400 flex items-center gap-1.5 whitespace-nowrap"
+            >
+              <i data-lucide="layers" class="w-3.5 h-3.5"></i>
+              <span>Evidence Trail</span>
+            </button>
+            <button
+              onclick="switchTab('cypher')"
+              id="tab-btn-cypher"
+              class="px-3.5 py-2.5 font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-1.5 whitespace-nowrap"
+            >
+              <i data-lucide="terminal" class="w-3.5 h-3.5"></i>
+              <span>Cypher Queries Executed</span>
+              <span
+                id="cypher-count-badge"
+                class="ml-1 text-[10px] px-1.5 py-0.2 rounded-full bg-slate-800 text-slate-300"
+                >0</span
+              >
+            </button>
+            <button
+              onclick="switchTab('memory')"
+              id="tab-btn-memory"
+              class="px-3.5 py-2.5 font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-1.5 whitespace-nowrap"
+            >
+              <i data-lucide="history" class="w-3.5 h-3.5"></i>
+              <span>Decisions & Graph Memory</span>
+            </button>
+            <button
+              onclick="switchTab('tasks')"
+              id="tab-btn-tasks"
+              class="px-3.5 py-2.5 font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-1.5 whitespace-nowrap"
+            >
+              <i data-lucide="check-square" class="w-3.5 h-3.5"></i>
+              <span>Tasks & Reminders</span>
+            </button>
+          </div>
+
+          <!-- Tab Contents Container -->
+          <div class="p-4 flex-1 overflow-y-auto max-h-[380px] text-xs">
+            <!-- TAB 1: Evidence Trail -->
+            <div id="tab-evidence" class="space-y-4">
+              <!-- Profile Card -->
+              <div
+                id="evidence-profile-box"
+                class="p-3.5 rounded-lg bg-slate-900/70 border border-slate-800 space-y-2"
+              >
+                <div class="flex items-center justify-between">
+                  <span
+                    class="font-semibold text-slate-200"
+                    id="evidence-customer-name"
+                    >No Customer Selected</span
+                  >
+                  <span
+                    class="text-[11px] text-slate-400"
+                    id="evidence-customer-type"
+                    >--</span
+                  >
+                </div>
+                <div
+                  class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 text-[11px]"
+                >
+                  <div
+                    class="bg-slate-800/50 p-2 rounded border border-slate-800"
+                  >
+                    <div class="text-slate-500">Credit Limit</div>
+                    <div class="font-bold text-slate-200" id="ev-credit-limit">
+                      $0.00
+                    </div>
+                  </div>
+                  <div
+                    class="bg-slate-800/50 p-2 rounded border border-slate-800"
+                  >
+                    <div class="text-slate-500">Outstanding Balance</div>
+                    <div class="font-bold text-amber-400" id="ev-outstanding">
+                      $0.00
+                    </div>
+                  </div>
+                  <div
+                    class="bg-slate-800/50 p-2 rounded border border-slate-800"
+                  >
+                    <div class="text-slate-500">Overdue Balance</div>
+                    <div class="font-bold text-rose-400" id="ev-overdue">
+                      $0.00
+                    </div>
+                  </div>
+                  <div
+                    class="bg-slate-800/50 p-2 rounded border border-slate-800"
+                  >
+                    <div class="text-slate-500">Total Settled</div>
+                    <div class="font-bold text-emerald-400" id="ev-total-paid">
+                      $0.00
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Connected Risk Warning Box -->
+              <div id="connected-risk-box" class="space-y-2">
+                <div
+                  class="flex items-center gap-1.5 font-semibold text-rose-400 text-xs"
+                >
+                  <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i>
+                  <span
+                    >Connected Risk Linkages (Shared Phone, Email,
+                    Address)</span
+                  >
+                </div>
+                <div
+                  id="connected-risk-content"
+                  class="text-slate-400 text-[11px]"
+                >
+                  No connected risks identified for current selection.
+                </div>
+              </div>
+
+              <!-- Invoices & Disputes Table -->
+              <div class="space-y-2">
+                <div
+                  class="flex items-center justify-between font-semibold text-slate-300 text-xs"
+                >
+                  <span>Recent Invoices & Payment Audit</span>
+                  <span class="text-[11px] text-slate-500 font-normal"
+                    >Multi-hop traversal</span
+                  >
+                </div>
+                <div class="overflow-x-auto rounded-lg border border-slate-800">
+                  <table class="w-full text-left text-[11px]">
+                    <thead
+                      class="bg-slate-900/90 text-slate-400 uppercase text-[10px] border-b border-slate-800"
+                    >
+                      <tr>
+                        <th class="p-2">Invoice #</th>
+                        <th class="p-2">Amount</th>
+                        <th class="p-2">Due Date</th>
+                        <th class="p-2">Status</th>
+                        <th class="p-2">Paid</th>
+                        <th class="p-2">Dispute / Issue</th>
+                      </tr>
+                    </thead>
+                    <tbody
+                      id="invoices-tbody"
+                      class="divide-y divide-slate-800/60 bg-slate-950/40 text-slate-300"
+                    >
+                      <tr>
+                        <td colspan="6" class="p-3 text-center text-slate-500">
+                          No invoices loaded.
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- TAB 2: Cypher Queries Executed -->
+            <div id="tab-cypher" class="hidden space-y-3">
+              <div
+                class="flex items-center justify-between text-[11px] text-slate-400"
+              >
+                <span>Every query below executed live against FalkorDB:</span>
+                <span class="text-pink-400 font-mono"
+                  >FalkorDB Cypher Engine</span
+                >
+              </div>
+              <div id="cypher-queries-list" class="space-y-3">
+                <div
+                  class="p-3 rounded-lg bg-slate-900/60 border border-slate-800 text-slate-500 text-center"
+                >
+                  No Cypher queries executed yet. Ask the agent a question to
+                  see real-time Cypher execution.
+                </div>
+              </div>
+            </div>
+
+            <!-- TAB 3: Decision History & Graph Memory -->
+            <div id="tab-memory" class="hidden space-y-4">
+              <!-- Memories Section -->
+              <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                  <span
+                    class="font-semibold text-purple-400 text-xs flex items-center gap-1.5"
+                  >
+                    <i data-lucide="brain" class="w-3.5 h-3.5"></i>
+                    <span>Long-Term Graph Memories (:AgentMemory)</span>
+                  </span>
+                  <button
+                    onclick="openMemoryModal()"
+                    class="text-[11px] text-blue-400 hover:underline"
+                  >
+                    + Add Fact/Policy
+                  </button>
+                </div>
+                <div id="memories-list" class="space-y-2">
+                  <div
+                    class="p-2.5 rounded bg-slate-900/60 border border-slate-800 text-slate-500"
+                  >
+                    No memories recorded for this customer.
+                  </div>
+                </div>
+              </div>
+
+              <!-- Prior Decisions Timeline -->
+              <div class="space-y-2">
+                <span
+                  class="font-semibold text-slate-300 text-xs flex items-center gap-1.5"
+                >
+                  <i
+                    data-lucide="history"
+                    class="w-3.5 h-3.5 text-blue-400"
+                  ></i>
+                  <span>Historical Recommendations (:AgentDecision)</span>
+                </span>
+                <div id="decisions-timeline" class="space-y-2.5">
+                  <div
+                    class="p-2.5 rounded bg-slate-900/60 border border-slate-800 text-slate-500"
+                  >
+                    No prior decisions recorded yet.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- TAB 4: Tasks & Reminders -->
+            <div id="tab-tasks" class="hidden space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="font-semibold text-slate-300 text-xs"
+                  >Customer Action Tasks (:AgentTask)</span
+                >
+                <button
+                  onclick="openTaskModal()"
+                  class="text-[11px] text-blue-400 hover:underline"
+                >
+                  + New Task
+                </button>
+              </div>
+              <div id="tasks-list" class="space-y-2">
+                <div
+                  class="p-2.5 rounded bg-slate-900/60 border border-slate-800 text-slate-500"
+                >
+                  No pending follow-up tasks.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer
+      class="border-t border-slate-800 bg-slate-900/80 py-2.5 px-4 text-center text-xs text-slate-500"
+    >
+      <span
+        >LedgerGraph • Built for the
+        <strong>Graph Hacks: Context for AI Agents</strong> Hackathon Powered by
+        <strong>FalkorDB</strong></span
+      >
+    </footer>
+
+    <!-- MODAL: Override Decision -->
+    <div
+      id="override-modal"
+      class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4"
+    >
+      <div
+        class="glass-panel-elevated rounded-xl max-w-md w-full p-5 space-y-4 shadow-2xl"
+      >
+        <div
+          class="flex items-center justify-between pb-2 border-b border-slate-700"
+        >
+          <h3
+            class="text-sm font-semibold text-slate-200 flex items-center gap-2"
+          >
+            <i data-lucide="shield-check" class="w-4 h-4 text-amber-400"></i>
+            <span>Owner Override / Feedback</span>
+          </h3>
+          <button
+            onclick="closeModal('override-modal')"
+            class="text-slate-400 hover:text-white"
+          >
+            ✕
+          </button>
+        </div>
+        <div class="space-y-3 text-xs">
+          <div>
+            <label class="block text-slate-400 mb-1">New Recommendation:</label>
+            <select
+              id="override-select"
+              class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-200"
+            >
+              <option value="APPROVE">APPROVE</option>
+              <option value="APPROVE WITH CONDITIONS">
+                APPROVE WITH CONDITIONS
+              </option>
+              <option value="HOLD">HOLD</option>
+              <option value="ESCALATE">ESCALATE</option>
+              <option value="CHASE PAYMENT">CHASE PAYMENT</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1"
+              >Owner Feedback / Rationale:</label
+            >
+            <textarea
+              id="override-feedback"
+              rows="3"
+              placeholder="e.g. Approved because director provided personal guarantee and bank collateral."
+              class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-200 placeholder-slate-500"
+            ></textarea>
+          </div>
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button
+            onclick="closeModal('override-modal')"
+            class="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 text-xs"
+          >
+            Cancel
+          </button>
+          <button
+            onclick="submitOverride()"
+            class="px-4 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-white font-medium text-xs"
+          >
+            Save Override to Graph
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: Create Task -->
+    <div
+      id="task-modal"
+      class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4"
+    >
+      <div
+        class="glass-panel-elevated rounded-xl max-w-md w-full p-5 space-y-4 shadow-2xl"
+      >
+        <div
+          class="flex items-center justify-between pb-2 border-b border-slate-700"
+        >
+          <h3
+            class="text-sm font-semibold text-slate-200 flex items-center gap-2"
+          >
+            <i data-lucide="check-square" class="w-4 h-4 text-blue-400"></i>
+            <span>Create Follow-Up Task (:AgentTask)</span>
+          </h3>
+          <button
+            onclick="closeModal('task-modal')"
+            class="text-slate-400 hover:text-white"
+          >
+            ✕
+          </button>
+        </div>
+        <div class="space-y-3 text-xs">
+          <div>
+            <label class="block text-slate-400 mb-1">Task Title:</label>
+            <input
+              type="text"
+              id="task-title-input"
+              placeholder="e.g. Call BrightMart about invoice INV-2026-0003"
+              class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-200"
+            />
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">Description:</label>
+            <textarea
+              id="task-desc-input"
+              rows="3"
+              placeholder="Inspect delivery waybills and discuss settlement terms."
+              class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-200"
+            ></textarea>
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">Due Date:</label>
+            <input
+              type="date"
+              id="task-due-input"
+              class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-200"
+            />
+          </div>
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button
+            onclick="closeModal('task-modal')"
+            class="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 text-xs"
+          >
+            Cancel
+          </button>
+          <button
+            onclick="submitNewTask()"
+            class="px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium text-xs"
+          >
+            Save Task
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: Payment Reminder Preview -->
+    <div
+      id="reminder-modal"
+      class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4"
+    >
+      <div
+        class="glass-panel-elevated rounded-xl max-w-lg w-full p-5 space-y-4 shadow-2xl"
+      >
+        <div
+          class="flex items-center justify-between pb-2 border-b border-slate-700"
+        >
+          <h3
+            class="text-sm font-semibold text-slate-200 flex items-center gap-2"
+          >
+            <i
+              data-lucide="message-square"
+              class="w-4 h-4 text-emerald-400"
+            ></i>
+            <span>Generate Payment Reminder</span>
+          </h3>
+          <button
+            onclick="closeModal('reminder-modal')"
+            class="text-slate-400 hover:text-white"
+          >
+            ✕
+          </button>
+        </div>
+        <div class="space-y-3 text-xs">
+          <div>
+            <label class="block text-slate-400 mb-1"
+              >Recipient Customer Phone / WhatsApp:</label
+            >
+            <input
+              type="text"
+              id="reminder-phone-input"
+              class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-200 font-mono"
+            />
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">Message Preview:</label>
+            <textarea
+              id="reminder-text-preview"
+              rows="7"
+              class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200 font-sans leading-relaxed"
+            ></textarea>
+          </div>
+        </div>
+        <div class="flex justify-between items-center pt-2">
+          <span class="text-[11px] text-slate-500"
+            >Ready to dispatch via WhatsApp or SMS</span
+          >
+          <div class="flex gap-2">
+            <button
+              onclick="closeModal('reminder-modal')"
+              class="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 text-xs"
+            >
+              Close
+            </button>
+            <button
+              onclick="copyReminderToClipboard()"
+              class="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs flex items-center gap-1.5"
+            >
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+              <span id="copy-btn-text">Copy Reminder</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: Add Memory -->
+    <div
+      id="memory-modal"
+      class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4"
+    >
+      <div
+        class="glass-panel-elevated rounded-xl max-w-md w-full p-5 space-y-4 shadow-2xl"
+      >
+        <div
+          class="flex items-center justify-between pb-2 border-b border-slate-700"
+        >
+          <h3
+            class="text-sm font-semibold text-slate-200 flex items-center gap-2"
+          >
+            <i data-lucide="brain" class="w-4 h-4 text-purple-400"></i>
+            <span>Add Graph Memory (:AgentMemory)</span>
+          </h3>
+          <button
+            onclick="closeModal('memory-modal')"
+            class="text-slate-400 hover:text-white"
+          >
+            ✕
+          </button>
+        </div>
+        <div class="space-y-3 text-xs">
+          <div>
+            <label class="block text-slate-400 mb-1">Memory Type:</label>
+            <select
+              id="memory-type-input"
+              class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-200"
+            >
+              <option value="POLICY">
+                POLICY (Owner credit limits & rules)
+              </option>
+              <option value="PREFERENCE">
+                PREFERENCE (Settlement methods, contacts)
+              </option>
+              <option value="FACT">
+                FACT (Warehouse locations, key personnel)
+              </option>
+              <option value="OUTCOME">
+                OUTCOME (Past settlement behavior)
+              </option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">Memory Content:</label>
+            <textarea
+              id="memory-content-input"
+              rows="3"
+              placeholder="e.g. Managing Director instructed never to release building supplies without cleared bank transfer."
+              class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-200"
+            ></textarea>
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">Importance (1-10):</label>
+            <input
+              type="number"
+              id="memory-importance-input"
+              value="8"
+              min="1"
+              max="10"
+              class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-200"
+            />
+          </div>
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button
+            onclick="closeModal('memory-modal')"
+            class="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 text-xs"
+          >
+            Cancel
+          </button>
+          <button
+            onclick="submitNewMemory()"
+            class="px-4 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-medium text-xs"
+          >
+            Save Memory
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: Upload CSV -->
+    <div
+      id="upload-modal"
+      class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4"
+    >
+      <div
+        class="glass-panel-elevated rounded-xl max-w-md w-full p-5 space-y-4 shadow-2xl"
+      >
+        <div
+          class="flex items-center justify-between pb-2 border-b border-slate-700"
+        >
+          <h3
+            class="text-sm font-semibold text-slate-200 flex items-center gap-2"
+          >
+            <i data-lucide="upload" class="w-4 h-4 text-blue-400"></i>
+            <span>Upload CSV Demo Dataset</span>
+          </h3>
+          <button
+            onclick="closeModal('upload-modal')"
+            class="text-slate-400 hover:text-white"
+          >
+            ✕
+          </button>
+        </div>
+        <div class="space-y-3 text-xs">
+          <p class="text-slate-400">
+            Upload any updated table (<code class="text-slate-300"
+              >customers.csv</code
+            >, <code class="text-slate-300">invoices.csv</code>,
+            <code class="text-slate-300">payments.csv</code>, etc.) to re-ingest
+            directly into FalkorDB.
+          </p>
+          <input
+            type="file"
+            id="csv-file-input"
+            accept=".csv"
+            class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-200 text-xs"
+          />
+          <div
+            id="upload-progress-text"
+            class="text-[11px] text-slate-400 italic hidden"
+          >
+            Uploading and re-seeding FalkorDB...
+          </div>
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button
+            onclick="closeModal('upload-modal')"
+            class="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 text-xs"
+          >
+            Cancel
+          </button>
+          <button
+            onclick="submitCsvUpload()"
+            class="px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium text-xs"
+          >
+            Upload & Re-seed
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- JavaScript Application Logic -->
+    <script src="/static/app.js"></script>
+    <script>
+      // Initialize Lucide icons
+      lucide.createIcons();
+    </script>
+  </body>
+</html>
