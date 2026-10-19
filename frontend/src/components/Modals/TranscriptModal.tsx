@@ -46,7 +46,7 @@ export const TranscriptModal: React.FC = () => {
               onClick={handleCopy}
               className="px-2.5 py-1 rounded-lg bg-white border border-black/15 text-xs font-mono text-ink hover:bg-black/5 flex items-center space-x-1"
             >
-              {copied ? <Check className="w-3.5 h-3.5 text-naira-green" /> : <Copy className="w-3.5 h-3.5" />}
+              {copied ? <Check className="w-3.5 h-3.5 text-dollar-green" /> : <Copy className="w-3.5 h-3.5" />}
               <span>{copied ? 'Copied' : 'Copy'}</span>
             </button>
             <button
@@ -97,7 +97,7 @@ export const TranscriptModal: React.FC = () => {
 
                 {item.response && (
                   <div className="mt-2 pt-2 border-t border-white/10 flex items-center justify-between font-mono text-[10px] text-muted">
-                    <span className="font-bold text-naira-green">
+                    <span className="font-bold text-dollar-green">
                       Verdict: {item.response.recommendation}
                     </span>
                     <span>

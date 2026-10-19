@@ -124,7 +124,7 @@ Thank you for your ongoing partnership.`;
               onClick={handleCopy}
               className="flex items-center space-x-1 text-brass hover:text-brass-light font-bold"
             >
-              {copied ? <Check className="w-3 h-3 text-naira-green" /> : <Copy className="w-3 h-3" />}
+              {copied ? <Check className="w-3 h-3 text-dollar-green" /> : <Copy className="w-3 h-3" />}
               <span>{copied ? 'Copied' : 'Copy Text'}</span>
             </button>
           </div>
@@ -155,7 +155,7 @@ Thank you for your ongoing partnership.`;
             type="button"
             disabled={isSubmitting}
             onClick={handleRecordDispatch}
-            className="px-4 py-2 rounded-lg bg-naira-green text-white font-mono text-xs font-semibold hover:bg-naira-green-light transition-colors disabled:opacity-50 flex items-center space-x-1.5 shadow-sm"
+            className="px-4 py-2 rounded-lg bg-dollar-green text-white font-mono text-xs font-semibold hover:bg-dollar-green-light transition-colors disabled:opacity-50 flex items-center space-x-1.5 shadow-sm"
           >
             {isSubmitting ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin" />

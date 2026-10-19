@@ -110,7 +110,7 @@ export const UploadCsvModal: React.FC = () => {
               className={`p-3 rounded-lg flex items-center space-x-2 text-xs font-mono ${
                 isError
                   ? 'bg-vermilion-dim text-vermilion border border-vermilion/30'
-                  : 'bg-naira-green-dim text-naira-green border border-naira-green/30'
+                  : 'bg-dollar-green-dim text-dollar-green border border-dollar-green/30'
               }`}
             >
               {isError ? (

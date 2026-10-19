@@ -1,7 +1,7 @@
-import React from 'react';
-import { PaymentHistoryItem } from '@/api/types';
-import { formatMoney, formatDate } from '@/lib/format';
-import { AlertCircle, CheckCircle, Clock } from 'lucide-react';
+import React from "react";
+import { PaymentHistoryItem } from "@/api/types";
+import { formatMoney, formatDate } from "@/lib/format";
+import { AlertCircle, CheckCircle, Clock } from "lucide-react";
 
 interface HistoryTableProps {
   history: PaymentHistoryItem[];
@@ -19,7 +19,9 @@ export const HistoryTable: React.FC<HistoryTableProps> = ({ history }) => {
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between text-xs font-mono text-ink-muted">
-        <span className="uppercase tracking-wider font-semibold">Trade History & Disputes</span>
+        <span className="uppercase tracking-wider font-semibold">
+          Trade History & Disputes
+        </span>
         <span>{history.length} records</span>
       </div>
 
@@ -36,21 +38,28 @@ export const HistoryTable: React.FC<HistoryTableProps> = ({ history }) => {
           </thead>
           <tbody className="divide-y divide-black/5">
             {history.map((item, idx) => {
-              const isOverdue = item.invoice_status === 'OVERDUE';
-              const isPaid = item.invoice_status === 'PAID';
+              const isOverdue = item.invoice_status === "OVERDUE";
+              const isPaid = item.invoice_status === "PAID";
 
               return (
-                <tr key={idx} className="hover:bg-black/[0.02] transition-colors">
-                  <td className="py-2.5 px-3 font-semibold text-ink">{item.invoice_number}</td>
-                  <td className="py-2.5 px-3 text-ink-muted">{formatDate(item.due_date)}</td>
+                <tr
+                  key={idx}
+                  className="hover:bg-black/[0.02] transition-colors"
+                >
+                  <td className="py-2.5 px-3 font-semibold text-ink">
+                    {item.invoice_number}
+                  </td>
+                  <td className="py-2.5 px-3 text-ink-muted">
+                    {formatDate(item.due_date)}
+                  </td>
                   <td className="py-2.5 px-3">
                     <span
                       className={`inline-flex items-center space-x-1 px-1.5 py-0.5 rounded text-[10px] font-bold ${
                         isOverdue
-                          ? 'bg-vermilion-dim text-vermilion border border-vermilion/30'
+                          ? "bg-vermilion-dim text-vermilion border border-vermilion/30"
                           : isPaid
-                          ? 'bg-naira-green-dim text-naira-green border border-naira-green/30'
-                          : 'bg-brass-dim text-brass border border-brass/30'
+                            ? "bg-dollar-green-dim text-dollar-green border border-dollar-green/30"
+                            : "bg-brass-dim text-brass border border-brass/30"
                       }`}
                     >
                       {isOverdue && <AlertCircle className="w-2.5 h-2.5" />}
@@ -67,14 +76,16 @@ export const HistoryTable: React.FC<HistoryTableProps> = ({ history }) => {
                   <td className="py-2.5 px-3 text-[11px] text-ink-muted font-sans">
                     {item.dispute_reason ? (
                       <span className="text-vermilion font-medium">
-                        {item.dispute_reason} ({item.dispute_severity || 'Open'})
+                        {item.dispute_reason} ({item.dispute_severity || "Open"}
+                        )
                       </span>
                     ) : item.paid_amount ? (
-                      <span className="text-naira-green">
-                        Settled {formatMoney(item.paid_amount, true)} on {formatDate(item.payment_date)}
+                      <span className="text-dollar-green">
+                        Settled {formatMoney(item.paid_amount, true)} on{" "}
+                        {formatDate(item.payment_date)}
                       </span>
                     ) : (
-                      '—'
+                      "-"
                     )}
                   </td>
                 </tr>

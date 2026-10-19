@@ -1,4 +1,4 @@
-# LedgerGraph — Autonomous Trade Credit & Cash-Flow Agent
+# LedgerGraph - Autonomous Trade Credit & Cash-Flow Agent
 
 > **Graph-grounded autonomous agent underwriting trade credit, uncovering contact-sharing delinquent syndicates, and protecting working capital in developing & frontier markets powered by FalkorDB.**
 
@@ -16,8 +16,8 @@ In developed economies, commercial credit is underwritten through centralized cr
 
 1. **Zero Formal Bureau Coverage**: Over 80% of commercial micro-enterprises, regional distributors, and contractors operate completely off-bureau. Centralized credit scoring does not exist.
 2. **Informal Trade Credit is the Real Banking System**: More than 70% of B2B commerce runs on supplier net-30 terms. Building-material distributors, FMCG wholesalers, and hardware merchants are forced to act as uncollateralized lenders. Over 60% of SME insolvencies stem directly from overdue receivables locking up working capital.
-3. **The "Phoenix Company" Contagion Ring**: Serial defaulters regularly abandon debts under one registered entity and quietly reopen under a new name or sibling alias—while sharing the exact same warehouse yard, delivery phone number, or commercial email. Relational SQL databases struggle with recursive multi-hop joins, and vector databases hallucinate text matches without structural guarantees.
-4. **Session Amnesia & Lost Covenants**: Trade credit agreements and dispute resolutions are negotiated verbally or across chat apps. Business owners forget prior dispute settlements (e.g., _"Require 30% advance deposit on orders above ₦1,000,000 due to past damaged goods dispute"_), repeatedly falling into the same traps.
+3. **The "Phoenix Company" Contagion Ring**: Serial defaulters regularly abandon debts under one registered entity and quietly reopen under a new name or sibling alias-while sharing the exact same warehouse yard, delivery phone number, or commercial email. Relational SQL databases struggle with recursive multi-hop joins, and vector databases hallucinate text matches without structural guarantees.
+4. **Session Amnesia & Lost Covenants**: Trade credit agreements and dispute resolutions are negotiated verbally or across chat apps. Business owners forget prior dispute settlements (e.g., _"Require 30% advance deposit on orders above $1,000,000 due to past damaged goods dispute"_), repeatedly falling into the same traps.
 
 ---
 
@@ -182,17 +182,17 @@ All 9 agent tools execute real Cypher queries against FalkorDB and return struct
 
 **Owner Inquiry:**
 
-> _“Should I approve a ₦20,000 order for BrightMart on 30-day credit?”_
+> _“Should I approve a $20,000 order for BrightMart on 30-day credit?”_
 
 **The Agent Recommendation:** `ESCALATE` (Confidence: 92% • Risk Score: 69/100)  
 **Business Explanation:**
 
 > **Recommendation: ESCALATE TO CREDIT COMMITTEE** (Risk Score: 69/100)  
 > High-priority alert on **BrightMart Hardware Ltd**. Graph network analysis uncovered direct contact sharing with known delinquent entities:  
-> • Shares Phone (`+1-555-019-2831`) and Address (`Plot 442, Industrial Area, Trade Hub Zone 1`) with delinquent sister entity **Metro Commercial Ventures** carrying **₦50,000.00** in defaulted debt across 2 invoices.  
-> • BrightMart currently has 1 overdue invoice `INV-2026-0003` (₦12,000.00, 33 days overdue) under an open dispute regarding damaged packaging.  
-> • Extending an additional ₦20,000.00 would bring total exposure to ₦47,000.00 (78% of their credit limit).  
-> • **Graph Memory (POLICY)**: Owner directive states: _"BrightMart has a connected entity (Metro Commercial) with delinquent overdue invoices. Require at least 30% advance deposit for orders above ₦10,000 until INV-103 dispute is cleared."_
+> • Shares Phone (`+1-555-019-2831`) and Address (`Plot 442, Industrial Area, Trade Hub Zone 1`) with delinquent sister entity **Metro Commercial Ventures** carrying **$50,000.00** in defaulted debt across 2 invoices.  
+> • BrightMart currently has 1 overdue invoice `INV-2026-0003` ($12,000.00, 33 days overdue) under an open dispute regarding damaged packaging.  
+> • Extending an additional $20,000.00 would bring total exposure to $47,000.00 (78% of their credit limit).  
+> • **Graph Memory (POLICY)**: Owner directive states: _"BrightMart has a connected entity (Metro Commercial) with delinquent overdue invoices. Require at least 30% advance deposit for orders above $10,000 until INV-103 dispute is cleared."_
 >
 > This topological pattern indicates potential phoenix entity restructuring across affiliated entities in the commercial trade corridor. Do not fulfill on open credit without personal corporate director guarantees.
 >
@@ -210,16 +210,16 @@ All 9 agent tools execute real Cypher queries against FalkorDB and return struct
 
 > **Historical Records for BrightMart Hardware Ltd:**  
 > **Last Decision:**  
-> • Inquiry: _"Should I approve a ₦20,000 order for BrightMart on 30-day credit?"_  
+> • Inquiry: _"Should I approve a $20,000 order for BrightMart on 30-day credit?"_  
 > • Recommendation: **ESCALATE** (Confidence: 92%)  
-> • Rationale: Identified contact sharing with delinquent entity Metro Commercial Ventures (₦50,000 overdue), plus active dispute on INV-2026-0003.
+> • Rationale: Identified contact sharing with delinquent entity Metro Commercial Ventures ($50,000 overdue), plus active dispute on INV-2026-0003.
 >
 > **Saved Graph Memories:**  
-> • `[POLICY]` Business owner directive: _"BrightMart has a connected entity (Metro Commercial) with delinquent overdue invoices. Require at least 30% advance deposit for orders above ₦10,000 until INV-103 dispute is cleared."_ _(Importance: 9/10)_  
+> • `[POLICY]` Business owner directive: _"BrightMart has a connected entity (Metro Commercial) with delinquent overdue invoices. Require at least 30% advance deposit for orders above $10,000 until INV-103 dispute is cleared."_ _(Importance: 9/10)_  
 > • `[PREFERENCE]` Customer prefers direct wire transfer settlements and requests digital receipts via WhatsApp / Email. _(Importance: 7/10)_
 >
 > **Open Follow-up Tasks:**  
-> • **Resolve cement damage dispute on INV-103 with BrightMart** (Status: `PENDING`) — Dispatch site inspector to verify 40 damaged cement bags at BrightMart Sector 4 warehouse and issue credit note so remaining balance can be collected.
+> • **Resolve cement damage dispute on INV-103 with BrightMart** (Status: `PENDING`) - Dispatch site inspector to verify 40 damaged cement bags at BrightMart Sector 4 warehouse and issue credit note so remaining balance can be collected.
 
 ---
 
@@ -231,10 +231,10 @@ All 9 agent tools execute real Cypher queries against FalkorDB and return struct
 
 **The Agent Response:**
 
-> You have **8 priority overdue invoices** totaling **₦187,000.00** requiring immediate chase:  
-> • **Horizon Aggregate Supplies** — Invoice `INV-2026-0013` for **₦21,000.00** (78 days overdue)  
-> • **Metro Commercial Ventures** — Invoice `INV-2026-0007` for **₦28,000.00** (38 days overdue)  
-> • **FastTrack Construction Ltd** — Invoice `INV-2026-0036` for **₦25,000.00** (29 days overdue)
+> You have **8 priority overdue invoices** totaling **$187,000.00** requiring immediate chase:  
+> • **Horizon Aggregate Supplies** - Invoice `INV-2026-0013` for **$21,000.00** (78 days overdue)  
+> • **Metro Commercial Ventures** - Invoice `INV-2026-0007` for **$28,000.00** (38 days overdue)  
+> • **FastTrack Construction Ltd** - Invoice `INV-2026-0036` for **$25,000.00** (29 days overdue)
 >
 > **Proposed Action**: Draft payment reminder for Horizon Aggregate Supplies (INV-2026-0013).
 

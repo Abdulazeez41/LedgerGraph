@@ -85,7 +85,7 @@ export const OverrideModal: React.FC = () => {
               required
               value={feedback}
               onChange={(e) => setFeedback(e.target.value)}
-              placeholder="e.g. Spoke directly with managing director; received post-dated cheque for ₦500,000 and verified warehouse inventory."
+              placeholder="e.g. Spoke directly with managing director; received wire settlement confirmation for $50,000 and verified warehouse inventory."
               className="w-full bg-white text-ink border border-black/15 rounded-lg p-2.5 font-sans text-xs focus:outline-none focus:border-brass placeholder:text-ink-muted/60"
             />
           </div>

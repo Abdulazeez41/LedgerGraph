@@ -37,7 +37,7 @@ export const DossierActions: React.FC = () => {
         }
         className="px-3 py-1.5 rounded-lg bg-white hover:bg-white/90 text-ink text-xs font-mono font-medium border border-black/15 shadow-sm transition-colors flex items-center space-x-1.5"
       >
-        <MessageSquare className="w-3.5 h-3.5 text-naira-green" />
+        <MessageSquare className="w-3.5 h-3.5 text-dollar-green" />
         <span>Draft Reminder</span>
       </button>
 
@@ -63,7 +63,7 @@ export const DossierActions: React.FC = () => {
         }
         className="px-3 py-1.5 rounded-lg bg-white hover:bg-white/90 text-ink text-xs font-mono font-medium border border-black/15 shadow-sm transition-colors flex items-center space-x-1.5"
       >
-        <Brain className="w-3.5 h-3.5 text-naira-green" />
+        <Brain className="w-3.5 h-3.5 text-dollar-green" />
         <span>Add Memory</span>
       </button>
     </div>

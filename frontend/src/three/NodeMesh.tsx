@@ -1,9 +1,9 @@
-import React, { useRef, useState } from 'react';
-import * as THREE from 'three';
-import { useFrame } from '@react-three/fiber';
-import { Html } from '@react-three/drei';
-import { SubgraphNode } from '@/api/types';
-import { formatMoney } from '@/lib/format';
+import React, { useRef, useState } from "react";
+import * as THREE from "three";
+import { useFrame } from "@react-three/fiber";
+import { Html } from "@react-three/drei";
+import { SubgraphNode } from "@/api/types";
+import { formatMoney } from "@/lib/format";
 
 interface NodeMeshProps {
   node: SubgraphNode;
@@ -26,11 +26,11 @@ export const NodeMesh: React.FC<NodeMeshProps> = ({
   // Gentle float / rotation
   useFrame((state, delta) => {
     if (meshRef.current) {
-      if (node.label === 'Customer') {
+      if (node.label === "Customer") {
         meshRef.current.rotation.y += delta * 0.4;
-      } else if (node.label === 'Payment') {
+      } else if (node.label === "Payment") {
         meshRef.current.rotation.x += delta * 0.5;
-      } else if (node.label === 'Dispute') {
+      } else if (node.label === "Dispute") {
         meshRef.current.rotation.z += delta * 0.6;
       }
     }
@@ -38,31 +38,31 @@ export const NodeMesh: React.FC<NodeMeshProps> = ({
 
   // Calculate base color based on type and properties
   const color = React.useMemo(() => {
-    if (isEvidence) return '#F4F0E6'; // bright highlight for reasoning path
+    if (isEvidence) return "#F4F0E6"; // bright highlight for reasoning path
 
     switch (node.label) {
-      case 'Customer': {
+      case "Customer": {
         const risk = node.properties?.risk_score ?? 50;
-        if (risk <= 35) return '#1E7F55'; // Naira green
-        if (risk <= 65) return '#C69234'; // Brass
-        return '#C2412D'; // Vermilion
+        if (risk <= 35) return "#1E7F55"; // Naira green
+        if (risk <= 65) return "#C69234"; // Brass
+        return "#C2412D"; // Vermilion
       }
-      case 'Invoice': {
+      case "Invoice": {
         const status = node.properties?.status;
-        if (status === 'OVERDUE') return '#C2412D';
-        if (status === 'PAID') return '#1E7F55';
-        return '#C69234';
+        if (status === "OVERDUE") return "#C2412D";
+        if (status === "PAID") return "#1E7F55";
+        return "#C69234";
       }
-      case 'Payment':
-        return '#2DA36F';
-      case 'Dispute':
-        return '#DC5540';
-      case 'Order':
-        return '#8A9890';
-      case 'Supplier':
-        return '#C69234';
+      case "Payment":
+        return "#2DA36F";
+      case "Dispute":
+        return "#DC5540";
+      case "Order":
+        return "#8A9890";
+      case "Supplier":
+        return "#C69234";
       default:
-        return '#8A9890';
+        return "#8A9890";
     }
   }, [node, isEvidence]);
 
@@ -72,17 +72,17 @@ export const NodeMesh: React.FC<NodeMeshProps> = ({
   // Geometry selector based on label silhouette
   const renderGeometry = () => {
     switch (node.label) {
-      case 'Customer':
+      case "Customer":
         return <octahedronGeometry args={[1.3, 0]} />;
-      case 'Order':
+      case "Order":
         return <cylinderGeometry args={[0.9, 0.9, 1.4, 6]} />;
-      case 'Invoice':
+      case "Invoice":
         return <boxGeometry args={[1.4, 1.4, 1.4]} />;
-      case 'Payment':
+      case "Payment":
         return <torusGeometry args={[0.9, 0.35, 12, 24]} />;
-      case 'Dispute':
+      case "Dispute":
         return <tetrahedronGeometry args={[1.3, 0]} />;
-      case 'Supplier':
+      case "Supplier":
         return <sphereGeometry args={[1.1, 16, 16]} />;
       default:
         return <sphereGeometry args={[0.8, 12, 12]} />;
@@ -115,7 +115,7 @@ export const NodeMesh: React.FC<NodeMeshProps> = ({
           metalness={0.6}
           transparent
           opacity={opacity}
-          emissive={isEvidence ? '#DCAB4A' : hovered ? color : '#000000'}
+          emissive={isEvidence ? "#DCAB4A" : hovered ? color : "#000000"}
           emissiveIntensity={isEvidence ? 0.8 : hovered ? 0.4 : 0.0}
         />
       </mesh>
@@ -140,11 +140,21 @@ export const NodeMesh: React.FC<NodeMeshProps> = ({
           {/* Concentric ground rings */}
           <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.05, 0]}>
             <ringGeometry args={[2.0, 2.3, 32]} />
-            <meshBasicMaterial color="#DCAB4A" side={THREE.DoubleSide} transparent opacity={0.5} />
+            <meshBasicMaterial
+              color="#DCAB4A"
+              side={THREE.DoubleSide}
+              transparent
+              opacity={0.5}
+            />
           </mesh>
           <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.05, 0]}>
             <ringGeometry args={[3.2, 3.5, 32]} />
-            <meshBasicMaterial color="#1E7F55" side={THREE.DoubleSide} transparent opacity={0.35} />
+            <meshBasicMaterial
+              color="#1E7F55"
+              side={THREE.DoubleSide}
+              transparent
+              opacity={0.35}
+            />
           </mesh>
         </group>
       )}
@@ -153,7 +163,12 @@ export const NodeMesh: React.FC<NodeMeshProps> = ({
       {isEvidence && !isFocused && (
         <mesh scale={1.8}>
           <ringGeometry args={[1.4, 1.55, 32]} />
-          <meshBasicMaterial color="#DCAB4A" side={THREE.DoubleSide} transparent opacity={0.65} />
+          <meshBasicMaterial
+            color="#DCAB4A"
+            side={THREE.DoubleSide}
+            transparent
+            opacity={0.65}
+          />
         </mesh>
       )}
 
@@ -177,13 +192,27 @@ export const NodeMesh: React.FC<NodeMeshProps> = ({
                 {node.name}
               </div>
               <div className="font-mono text-[10px] text-brass-light flex items-center justify-center space-x-1.5 mt-0.5">
-                <span className="bg-brass-dim px-1.5 py-0.5 rounded border border-brass/30 font-semibold">{node.id}</span>
+                <span className="bg-brass-dim px-1.5 py-0.5 rounded border border-brass/30 font-semibold">
+                  {node.id}
+                </span>
                 <span>•</span>
-                <span className="text-chalk/80">{node.properties?.business_type || 'Commercial SME'}</span>
+                <span className="text-chalk/80">
+                  {node.properties?.business_type || "Commercial SME"}
+                </span>
               </div>
               <div className="mt-1 pt-1 border-t border-white/10 flex items-center justify-between text-[10px] font-mono">
-                <span className="text-muted">Risk: <strong className="text-naira-green">{node.properties?.risk_score ?? '—'}</strong></span>
-                <span className="text-muted">Limit: <strong className="text-chalk">{formatMoney(node.properties?.credit_limit, true)}</strong></span>
+                <span className="text-muted">
+                  Risk:{" "}
+                  <strong className="text-dollar-green">
+                    {node.properties?.risk_score ?? "-"}
+                  </strong>
+                </span>
+                <span className="text-muted">
+                  Limit:{" "}
+                  <strong className="text-chalk">
+                    {formatMoney(node.properties?.credit_limit, true)}
+                  </strong>
+                </span>
               </div>
             </div>
             {/* Pointer arrow pointing to node */}
@@ -200,22 +229,30 @@ export const NodeMesh: React.FC<NodeMeshProps> = ({
               <span className="text-[9px] uppercase tracking-wider text-brass font-bold">
                 {node.label}:
               </span>
-              <span>{node.name || node.properties?.invoice_number || node.id}</span>
+              <span>
+                {node.name || node.properties?.invoice_number || node.id}
+              </span>
             </div>
-            {node.label === 'Customer' && (
+            {node.label === "Customer" && (
               <div className="mt-1 space-y-0.5 text-[10px] text-muted">
                 <div className="flex items-center space-x-1.5">
-                  <span className="text-brass font-bold">ID: {node.id || node.properties?.id || '—'}</span>
+                  <span className="text-brass font-bold">
+                    ID: {node.id || node.properties?.id || "-"}
+                  </span>
                   <span>•</span>
-                  <span className="truncate max-w-[160px]">{node.properties?.business_type || 'SME'}</span>
+                  <span className="truncate max-w-[160px]">
+                    {node.properties?.business_type || "SME"}
+                  </span>
                 </div>
                 <div className="flex space-x-2">
-                  <span>Risk: {node.properties?.risk_score ?? '—'}</span>
-                  <span>Limit: {formatMoney(node.properties?.credit_limit, true)}</span>
+                  <span>Risk: {node.properties?.risk_score ?? "-"}</span>
+                  <span>
+                    Limit: {formatMoney(node.properties?.credit_limit, true)}
+                  </span>
                 </div>
               </div>
             )}
-            {node.label === 'Invoice' && (
+            {node.label === "Invoice" && (
               <div className="text-[10px] text-muted flex space-x-2 mt-0.5">
                 <span>{node.properties?.status}</span>
                 <span>{formatMoney(node.properties?.amount, true)}</span>

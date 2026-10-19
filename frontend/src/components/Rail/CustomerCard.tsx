@@ -75,7 +75,7 @@ export const CustomerCard: React.FC<CustomerCardProps> = ({ customer, isSelected
         <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
           <div
             className={`h-full rounded-full transition-all duration-500 ${
-              overdue > 0 ? 'bg-vermilion' : 'bg-naira-green/40'
+              overdue > 0 ? 'bg-vermilion' : 'bg-dollar-green/40'
             }`}
             style={{ width: `${Math.max(4, overduePercent)}%` }}
           />

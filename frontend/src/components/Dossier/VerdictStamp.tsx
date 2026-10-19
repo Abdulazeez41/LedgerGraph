@@ -21,9 +21,9 @@ export const VerdictStamp: React.FC<VerdictStampProps> = ({
     switch (verdictUpper) {
       case 'APPROVE':
         return {
-          textColor: 'text-naira-green',
-          borderColor: 'border-naira-green',
-          subColor: 'text-naira-green-light',
+          textColor: 'text-dollar-green',
+          borderColor: 'border-dollar-green',
+          subColor: 'text-dollar-green-light',
         };
       case 'APPROVE WITH CONDITIONS':
       case 'HOLD':

@@ -5,8 +5,8 @@ import { CameraControls } from './CameraControls';
 
 const QUICK_INQUIRIES = [
   {
-    label: 'BrightMart ₦20,000 Credit',
-    question: 'Should I approve a ₦20,000 order for BrightMart on 30-day credit?',
+    label: 'BrightMart $20,000 Credit',
+    question: 'Should I approve a $20,000 order for BrightMart on 30-day credit?',
     customer: 'BrightMart Hardware Ltd',
     amount: 20000,
   },
@@ -99,7 +99,7 @@ export const QuestionBar: React.FC = () => {
             type="submit"
             disabled={!question.trim() || isAgentWorking}
             aria-label="Send inquiry to agent"
-            className="p-2.5 rounded-xl bg-naira-green hover:bg-naira-green-light text-chalk transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center flex-shrink-0 shadow-sm"
+            className="p-2.5 rounded-xl bg-dollar-green hover:bg-dollar-green-light text-chalk transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center flex-shrink-0 shadow-sm"
           >
             {isAgentWorking ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
           </button>

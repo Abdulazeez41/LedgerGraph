@@ -112,7 +112,7 @@ export const MemoryModal: React.FC = () => {
             <button
               type="submit"
               disabled={isSubmitting || !content.trim()}
-              className="px-4 py-2 rounded-lg bg-naira-green text-white font-mono text-xs font-semibold hover:bg-naira-green-light transition-colors disabled:opacity-50 flex items-center space-x-1.5 shadow-sm"
+              className="px-4 py-2 rounded-lg bg-dollar-green text-white font-mono text-xs font-semibold hover:bg-dollar-green-light transition-colors disabled:opacity-50 flex items-center space-x-1.5 shadow-sm"
             >
               {isSubmitting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Brain className="w-3.5 h-3.5" />}
               <span>Save to Agent Memory</span>

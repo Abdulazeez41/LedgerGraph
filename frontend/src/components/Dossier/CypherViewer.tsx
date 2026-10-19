@@ -74,7 +74,7 @@ export const CypherViewer: React.FC<CypherViewerProps> = ({ queries }) => {
                     className="p-1 rounded hover:bg-white/10 text-muted hover:text-chalk transition-colors"
                     title="Copy Cypher query"
                   >
-                    {isCopied ? <Check className="w-3.5 h-3.5 text-naira-green" /> : <Copy className="w-3.5 h-3.5" />}
+                    {isCopied ? <Check className="w-3.5 h-3.5 text-dollar-green" /> : <Copy className="w-3.5 h-3.5" />}
                   </button>
                 </div>
               </div>

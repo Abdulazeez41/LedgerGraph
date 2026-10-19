@@ -68,7 +68,7 @@ export const NetworksList: React.FC<NetworksListProps> = ({ rings, selectedRingI
                 <span className="text-[10px] uppercase text-muted block">Delinquent Overdue</span>
                 <span
                   className={`font-semibold ${
-                    ring.totalOverdue > 0 ? 'text-vermilion-light' : 'text-naira-green'
+                    ring.totalOverdue > 0 ? 'text-vermilion-light' : 'text-dollar-green'
                   }`}
                 >
                   {formatMoney(ring.totalOverdue, true)}

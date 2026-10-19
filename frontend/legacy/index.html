@@ -1,569 +1,1027 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LedgerGraph — Trade Credit &amp; Receivables Ledger</title>
-  
-  <!-- Typography: Fraunces (verdicts & headers), Schibsted Grotesk (UI & body), IBM Plex Mono (tabular numbers, Cypher, IDs) -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,400..800,0..100;1,9..144,400..800,0..100&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Schibsted+Grotesk:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
-  
-  <!-- Pinned Three.js for 3D topological constellation (r128) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  
-  <!-- Ledger Room Design System Stylesheet -->
-  <link rel="stylesheet" href="/static/styles.css">
-</head>
-<body class="ledger-desk">
-  <!-- Subtle SVG Noise Texture Filter (in-memory, no external asset) -->
-  <svg class="noise-svg-def" aria-hidden="true" width="0" height="0">
-    <defs>
-      <filter id="ledger-grain" x="0%" y="0%" width="100%" height="100%">
-        <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" result="noise"/>
-        <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.05 0"/>
-      </filter>
-    </defs>
-  </svg>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LedgerGraph - Trade Credit &amp; Receivables Ledger</title>
 
-  <div class="ledger-room" id="ledger-room">
+    <!-- Typography: Fraunces (verdicts & headers), Schibsted Grotesk (UI & body), IBM Plex Mono (tabular numbers, Cypher, IDs) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,400..800,0..100;1,9..144,400..800,0..100&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Schibsted+Grotesk:ital,wght@0,400..700;1,400..700&display=swap"
+      rel="stylesheet"
+    />
 
-    <!-- 0. LEDGER STRIP (Top 44px full-width ruled ledger line) -->
-    <header class="ledger-strip" role="banner">
-      <div class="strip-left">
-        <div class="strip-brand">
-          <span class="brand-title">LedgerGraph</span>
-          <span class="brand-rule"></span>
-        </div>
-        <div class="strip-metrics" aria-label="Working Capital Summary">
-          <div class="metric-cell">
-            <span class="metric-label">RECEIVABLES</span>
-            <span class="metric-val" id="strip-receivables">₦0</span>
-          </div>
-          <div class="metric-cell">
-            <span class="metric-label">OVERDUE</span>
-            <span class="metric-val vermilion" id="strip-overdue">₦0</span>
-          </div>
-          <div class="metric-cell">
-            <span class="metric-label">AT RISK</span>
-            <span class="metric-val brass" id="strip-exposure">₦0</span>
-          </div>
-          <div class="metric-cell">
-            <span class="metric-label">DISTRESSED ACCOUNTS</span>
-            <span class="metric-val" id="strip-distress">0</span>
-          </div>
-          <span class="metric-note">from loaded accounts</span>
-        </div>
-      </div>
+    <!-- Pinned Three.js for 3D topological constellation (r128) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
-      <div class="strip-right">
-        <div class="strip-status" id="db-status-badge">
-          <span class="status-dot" id="status-dot"></span>
-          <span class="status-text" id="status-text">Connecting...</span>
-        </div>
-        <button class="strip-btn" id="btn-upload-open" onclick="openModal('modal-upload')" title="Upload CSV demo dataset">Upload CSV</button>
-        <button class="strip-btn" id="btn-reseed-data" onclick="triggerDatabaseReset()" title="Reset FalkorDB to seed data">Reset Graph</button>
-        <!-- Mobile Drawer Toggle Buttons -->
-        <button class="mobile-toggle-btn book-toggle" id="btn-toggle-book" onclick="toggleBookDrawer()" aria-label="Toggle Accounts Book">Book</button>
-        <button class="mobile-toggle-btn dossier-toggle" id="btn-toggle-dossier" onclick="toggleDossierDrawer()" aria-label="Toggle Dossier">Dossier</button>
-      </div>
-    </header>
+    <!-- Ledger Room Design System Stylesheet -->
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body class="ledger-desk">
+    <!-- Subtle SVG Noise Texture Filter (in-memory, no external asset) -->
+    <svg class="noise-svg-def" aria-hidden="true" width="0" height="0">
+      <defs>
+        <filter id="ledger-grain" x="0%" y="0%" width="100%" height="100%">
+          <feTurbulence
+            type="fractalNoise"
+            baseFrequency="0.65"
+            numOctaves="3"
+            stitchTiles="stitch"
+            result="noise"
+          />
+          <feColorMatrix
+            type="matrix"
+            values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.05 0"
+          />
+        </filter>
+      </defs>
+    </svg>
 
-    <!-- MAIN WORKSPACE: 3 ZONES (The Book, The Map, The Dossier) -->
-    <div class="workspace-body">
-
-      <!-- 1. LEFT RAIL: "THE BOOK" (~280px) -->
-      <aside class="the-book" id="the-book" aria-label="Accounts and Networks Register">
-        <!-- Tab Switcher (Underlined Text) -->
-        <div class="book-nav" role="tablist">
-          <button class="book-tab active" id="tab-btn-customers" role="tab" aria-selected="true" onclick="switchBookTab('customers')">Customers</button>
-          <button class="book-tab" id="tab-btn-networks" role="tab" aria-selected="false" onclick="switchBookTab('networks')">Networks</button>
-        </div>
-
-        <!-- Book Pane: Customers Register -->
-        <div class="book-pane" id="book-pane-customers" role="tabpanel">
-          <div class="pane-search-row">
-            <input type="search" id="customer-search-input" class="ledger-input search-input" placeholder="Search customer accounts..." autocomplete="off" oninput="onCustomerSearchInput(this.value)">
+    <div class="ledger-room" id="ledger-room">
+      <!-- 0. LEDGER STRIP (Top 44px full-width ruled ledger line) -->
+      <header class="ledger-strip" role="banner">
+        <div class="strip-left">
+          <div class="strip-brand">
+            <span class="brand-title">LedgerGraph</span>
+            <span class="brand-rule"></span>
           </div>
-          <div class="customer-count-row">
-            <span id="customer-count-text">Loading ledger accounts...</span>
-          </div>
-          <div class="customer-index-list" id="customer-index-list" role="listbox" tabindex="0">
-            <!-- Populated via app.js -->
+          <div class="strip-metrics" aria-label="Working Capital Summary">
+            <div class="metric-cell">
+              <span class="metric-label">RECEIVABLES</span>
+              <span class="metric-val" id="strip-receivables">₦0</span>
+            </div>
+            <div class="metric-cell">
+              <span class="metric-label">OVERDUE</span>
+              <span class="metric-val vermilion" id="strip-overdue">₦0</span>
+            </div>
+            <div class="metric-cell">
+              <span class="metric-label">AT RISK</span>
+              <span class="metric-val brass" id="strip-exposure">₦0</span>
+            </div>
+            <div class="metric-cell">
+              <span class="metric-label">DISTRESSED ACCOUNTS</span>
+              <span class="metric-val" id="strip-distress">0</span>
+            </div>
+            <span class="metric-note">from loaded accounts</span>
           </div>
         </div>
 
-        <!-- Book Pane: Networks Register (Auditor findings) -->
-        <div class="book-pane hidden" id="book-pane-networks" role="tabpanel">
-          <div class="pane-headline-row">
-            <span class="pane-headline">Delinquent Contact Clusters</span>
-            <span class="pane-subline">Shared phone, email, or address contagion</span>
+        <div class="strip-right">
+          <div class="strip-status" id="db-status-badge">
+            <span class="status-dot" id="status-dot"></span>
+            <span class="status-text" id="status-text">Connecting...</span>
           </div>
-          <div class="networks-index-list" id="networks-index-list">
-            <!-- Populated via app.js -->
-          </div>
+          <button
+            class="strip-btn"
+            id="btn-upload-open"
+            onclick="openModal('modal-upload')"
+            title="Upload CSV demo dataset"
+          >
+            Upload CSV
+          </button>
+          <button
+            class="strip-btn"
+            id="btn-reseed-data"
+            onclick="triggerDatabaseReset()"
+            title="Reset FalkorDB to seed data"
+          >
+            Reset Graph
+          </button>
+          <!-- Mobile Drawer Toggle Buttons -->
+          <button
+            class="mobile-toggle-btn book-toggle"
+            id="btn-toggle-book"
+            onclick="toggleBookDrawer()"
+            aria-label="Toggle Accounts Book"
+          >
+            Book
+          </button>
+          <button
+            class="mobile-toggle-btn dossier-toggle"
+            id="btn-toggle-dossier"
+            onclick="toggleDossierDrawer()"
+            aria-label="Toggle Dossier"
+          >
+            Dossier
+          </button>
         </div>
+      </header>
 
-        <div class="book-footer">
-          <span class="book-tagline">Credit decisions, with the working shown.</span>
-        </div>
-      </aside>
-
-      <!-- 2. CENTER STAGE: "THE MAP" (3D Constellation & Ruled Inquiries) -->
-      <main class="the-map" id="the-map" aria-label="Relationship Constellation and Query Stage">
-        
-        <!-- Top Stage Scope Switcher -->
-        <div class="stage-top-controls">
-          <div class="stage-breadcrumbs" id="stage-breadcrumbs">
-            <span class="stage-crumb-root">Stage</span>
-            <span class="stage-crumb-sep">/</span>
-            <span class="stage-crumb-current" id="stage-crumb-customer">Whole Book</span>
-          </div>
-          <div class="stage-scope-toggle" role="radiogroup" aria-label="Constellation Scope">
-            <button class="scope-btn active" id="scope-btn-neighborhood" onclick="setMapScope('neighborhood')">Neighbourhood</button>
-            <span class="scope-sep">|</span>
-            <button class="scope-btn" id="scope-btn-whole" onclick="setMapScope('whole')">Whole book</button>
-            <span class="scope-sep">|</span>
-            <button class="scope-btn" id="scope-btn-networks" onclick="setMapScope('networks')">Networks</button>
-          </div>
-        </div>
-
-        <!-- 3D Canvas Container -->
-        <div class="stage-canvas-wrap" id="stage-canvas-wrap">
-          <canvas id="webgl-canvas" aria-label="Interactive graph of the selected customer's relationships"></canvas>
-          <!-- 2D SVG Fallback if WebGL unavailable or CDN fails -->
-          <svg id="svg-fallback-canvas" class="svg-fallback hidden" aria-hidden="true"></svg>
-          
-          <!-- Node Hover Tag (Paper tag with mono metrics) -->
-          <div id="node-tag" class="node-paper-tag hidden" aria-hidden="true"></div>
-
-          <!-- Working Scanner Overlay -->
-          <div id="stage-working-overlay" class="stage-working-overlay hidden" aria-live="polite">
-            <div class="radar-scan-line"></div>
-            <span class="working-caption" id="working-caption-text">Agent is working...</span>
-          </div>
-        </div>
-
-        <!-- Stage Bottom: Prompt Bar & Typeset Transcript -->
-        <div class="stage-bottom-console">
-          
-          <!-- Suggested Inquiries (Tasteful, accountant-grade) -->
-          <div class="stage-prompts-lozenge-row">
-            <span class="prompts-label">Ledger Inquiries:</span>
-            <button class="prompt-chip" onclick="useSuggestedQuery('Should I approve a ₦20,000,000 order for BrightMart on 30-day credit?', 20000000)">₦20m Credit for BrightMart?</button>
-            <button class="prompt-chip" onclick="useSuggestedQuery('What did we decide about BrightMart last time?')">What did we decide about BrightMart?</button>
-            <button class="prompt-chip" onclick="useSuggestedQuery('What if BrightMart does not pay?')">What if BrightMart doesn't pay?</button>
-            <button class="prompt-chip" onclick="useSuggestedQuery('Which customers are highest credit risk this week?')">Highest Risk Accounts</button>
-            <button class="prompt-chip" onclick="useSuggestedQuery('Which invoices should I chase today?')">Invoices to Chase</button>
+      <!-- MAIN WORKSPACE: 3 ZONES (The Book, The Map, The Dossier) -->
+      <div class="workspace-body">
+        <!-- 1. LEFT RAIL: "THE BOOK" (~280px) -->
+        <aside
+          class="the-book"
+          id="the-book"
+          aria-label="Accounts and Networks Register"
+        >
+          <!-- Tab Switcher (Underlined Text) -->
+          <div class="book-nav" role="tablist">
+            <button
+              class="book-tab active"
+              id="tab-btn-customers"
+              role="tab"
+              aria-selected="true"
+              onclick="switchBookTab('customers')"
+            >
+              Customers
+            </button>
+            <button
+              class="book-tab"
+              id="tab-btn-networks"
+              role="tab"
+              aria-selected="false"
+              onclick="switchBookTab('networks')"
+            >
+              Networks
+            </button>
           </div>
 
-          <!-- Transcript of Inquiries & Agent Answers (Collapsible) -->
-          <div class="stage-transcript" id="stage-transcript">
-            <div class="transcript-stream" id="transcript-stream" aria-live="polite">
-              <!-- Dynamically appended conversation rows -->
+          <!-- Book Pane: Customers Register -->
+          <div class="book-pane" id="book-pane-customers" role="tabpanel">
+            <div class="pane-search-row">
+              <input
+                type="search"
+                id="customer-search-input"
+                class="ledger-input search-input"
+                placeholder="Search customer accounts..."
+                autocomplete="off"
+                oninput="onCustomerSearchInput(this.value)"
+              />
+            </div>
+            <div class="customer-count-row">
+              <span id="customer-count-text">Loading ledger accounts...</span>
+            </div>
+            <div
+              class="customer-index-list"
+              id="customer-index-list"
+              role="listbox"
+              tabindex="0"
+            >
+              <!-- Populated via app.js -->
             </div>
           </div>
 
-          <!-- Long Ruled Line Inquiry Input Form -->
-          <form class="stage-inquiry-bar" id="inquiry-form" onsubmit="handleInquirySubmit(event)">
-            <span class="inquiry-prompt" aria-hidden="true">/</span>
-            <input type="text" id="inquiry-input" class="inquiry-input-field" placeholder="Ask about a customer, an order, or an invoice (press / to focus)" autocomplete="off">
-            <div class="amount-field-wrap" title="Order Amount under consideration">
-              <span class="amount-symbol" id="input-currency-symbol">₦</span>
-              <input type="number" id="order-amount-field" class="amount-input-field" placeholder="0" min="0" step="any">
+          <!-- Book Pane: Networks Register (Auditor findings) -->
+          <div class="book-pane hidden" id="book-pane-networks" role="tabpanel">
+            <div class="pane-headline-row">
+              <span class="pane-headline">Delinquent Contact Clusters</span>
+              <span class="pane-subline"
+                >Shared phone, email, or address contagion</span
+              >
             </div>
-            <button type="submit" id="btn-submit-inquiry" class="inquiry-send-btn">EVALUATE</button>
-          </form>
-        </div>
-      </main>
-
-      <!-- 3. RIGHT SIDE: "THE DOSSIER" (Paper-Textured Sliding Assessment Panel) -->
-      <aside class="the-dossier" id="the-dossier" aria-label="Customer Credit Dossier and Audit Trail">
-        
-        <!-- Dossier Top Controls -->
-        <div class="dossier-header-bar">
-          <div class="dossier-subject">
-            <span class="subject-sub">CREDIT DOSSIER</span>
-            <h2 class="subject-name" id="dossier-customer-name">No Customer Selected</h2>
-            <div class="subject-meta" id="dossier-customer-meta">Select an account from the book to inspect</div>
+            <div class="networks-index-list" id="networks-index-list">
+              <!-- Populated via app.js -->
+            </div>
           </div>
-          <button class="dossier-close-btn" id="dossier-close-btn" onclick="closeDossier()" aria-label="Close Dossier">✕</button>
-        </div>
 
-        <!-- 3a. TRACE BAR (100% Honest Cypher Traceability Computation) -->
-        <div class="dossier-trace-bar" id="dossier-trace-bar" aria-live="polite">
-          <span class="trace-icon">✓</span>
-          <span class="trace-text" id="trace-bar-text">All claims verified by graph traversal</span>
-        </div>
+          <div class="book-footer">
+            <span class="book-tagline"
+              >Credit decisions, with the working shown.</span
+            >
+          </div>
+        </aside>
 
-        <div class="dossier-scroll-area">
+        <!-- 2. CENTER STAGE: "THE MAP" (3D Constellation & Ruled Inquiries) -->
+        <main
+          class="the-map"
+          id="the-map"
+          aria-label="Relationship Constellation and Query Stage"
+        >
+          <!-- Top Stage Scope Switcher -->
+          <div class="stage-top-controls">
+            <div class="stage-breadcrumbs" id="stage-breadcrumbs">
+              <span class="stage-crumb-root">Stage</span>
+              <span class="stage-crumb-sep">/</span>
+              <span class="stage-crumb-current" id="stage-crumb-customer"
+                >Whole Book</span
+              >
+            </div>
+            <div
+              class="stage-scope-toggle"
+              role="radiogroup"
+              aria-label="Constellation Scope"
+            >
+              <button
+                class="scope-btn active"
+                id="scope-btn-neighborhood"
+                onclick="setMapScope('neighborhood')"
+              >
+                Neighbourhood
+              </button>
+              <span class="scope-sep">|</span>
+              <button
+                class="scope-btn"
+                id="scope-btn-whole"
+                onclick="setMapScope('whole')"
+              >
+                Whole book
+              </button>
+              <span class="scope-sep">|</span>
+              <button
+                class="scope-btn"
+                id="scope-btn-networks"
+                onclick="setMapScope('networks')"
+              >
+                Networks
+              </button>
+            </div>
+          </div>
 
-          <!-- 3b. THE VERDICT (Rubber-stamp typography & confidence gauge) -->
-          <div class="dossier-verdict-section" id="dossier-verdict-section">
-            <div class="verdict-row">
-              <div class="verdict-stamp-wrap">
-                <span class="verdict-stamp stamp-neutral" id="verdict-stamp">READY</span>
+          <!-- 3D Canvas Container -->
+          <div class="stage-canvas-wrap" id="stage-canvas-wrap">
+            <canvas
+              id="webgl-canvas"
+              aria-label="Interactive graph of the selected customer's relationships"
+            ></canvas>
+            <!-- 2D SVG Fallback if WebGL unavailable or CDN fails -->
+            <svg
+              id="svg-fallback-canvas"
+              class="svg-fallback hidden"
+              aria-hidden="true"
+            ></svg>
+
+            <!-- Node Hover Tag (Paper tag with mono metrics) -->
+            <div
+              id="node-tag"
+              class="node-paper-tag hidden"
+              aria-hidden="true"
+            ></div>
+
+            <!-- Working Scanner Overlay -->
+            <div
+              id="stage-working-overlay"
+              class="stage-working-overlay hidden"
+              aria-live="polite"
+            >
+              <div class="radar-scan-line"></div>
+              <span class="working-caption" id="working-caption-text"
+                >Agent is working...</span
+              >
+            </div>
+          </div>
+
+          <!-- Stage Bottom: Prompt Bar & Typeset Transcript -->
+          <div class="stage-bottom-console">
+            <!-- Suggested Inquiries (Tasteful, accountant-grade) -->
+            <div class="stage-prompts-lozenge-row">
+              <span class="prompts-label">Ledger Inquiries:</span>
+              <button
+                class="prompt-chip"
+                onclick="
+                  useSuggestedQuery(
+                    'Should I approve a ₦20,000,000 order for BrightMart on 30-day credit?',
+                    20000000,
+                  )
+                "
+              >
+                ₦20m Credit for BrightMart?
+              </button>
+              <button
+                class="prompt-chip"
+                onclick="
+                  useSuggestedQuery(
+                    'What did we decide about BrightMart last time?',
+                  )
+                "
+              >
+                What did we decide about BrightMart?
+              </button>
+              <button
+                class="prompt-chip"
+                onclick="useSuggestedQuery('What if BrightMart does not pay?')"
+              >
+                What if BrightMart doesn't pay?
+              </button>
+              <button
+                class="prompt-chip"
+                onclick="
+                  useSuggestedQuery(
+                    'Which customers are highest credit risk this week?',
+                  )
+                "
+              >
+                Highest Risk Accounts
+              </button>
+              <button
+                class="prompt-chip"
+                onclick="
+                  useSuggestedQuery('Which invoices should I chase today?')
+                "
+              >
+                Invoices to Chase
+              </button>
+            </div>
+
+            <!-- Transcript of Inquiries & Agent Answers (Collapsible) -->
+            <div class="stage-transcript" id="stage-transcript">
+              <div
+                class="transcript-stream"
+                id="transcript-stream"
+                aria-live="polite"
+              >
+                <!-- Dynamically appended conversation rows -->
               </div>
-              <div class="verdict-confidence-block">
-                <div class="confidence-label-row">
-                  <span class="confidence-label">CONFIDENCE</span>
-                  <span class="confidence-val font-mono" id="verdict-confidence-num">--%</span>
-                </div>
-                <div class="confidence-bar-track">
-                  <div class="confidence-bar-fill" id="confidence-bar-fill" style="width: 0%;"></div>
-                </div>
-                <div class="risk-score-sub font-mono" id="verdict-risk-score">Score: --/100</div>
+            </div>
+
+            <!-- Long Ruled Line Inquiry Input Form -->
+            <form
+              class="stage-inquiry-bar"
+              id="inquiry-form"
+              onsubmit="handleInquirySubmit(event)"
+            >
+              <span class="inquiry-prompt" aria-hidden="true">/</span>
+              <input
+                type="text"
+                id="inquiry-input"
+                class="inquiry-input-field"
+                placeholder="Ask about a customer, an order, or an invoice (press / to focus)"
+                autocomplete="off"
+              />
+              <div
+                class="amount-field-wrap"
+                title="Order Amount under consideration"
+              >
+                <span class="amount-symbol" id="input-currency-symbol">₦</span>
+                <input
+                  type="number"
+                  id="order-amount-field"
+                  class="amount-input-field"
+                  placeholder="0"
+                  min="0"
+                  step="any"
+                />
+              </div>
+              <button
+                type="submit"
+                id="btn-submit-inquiry"
+                class="inquiry-send-btn"
+              >
+                EVALUATE
+              </button>
+            </form>
+          </div>
+        </main>
+
+        <!-- 3. RIGHT SIDE: "THE DOSSIER" (Paper-Textured Sliding Assessment Panel) -->
+        <aside
+          class="the-dossier"
+          id="the-dossier"
+          aria-label="Customer Credit Dossier and Audit Trail"
+        >
+          <!-- Dossier Top Controls -->
+          <div class="dossier-header-bar">
+            <div class="dossier-subject">
+              <span class="subject-sub">CREDIT DOSSIER</span>
+              <h2 class="subject-name" id="dossier-customer-name">
+                No Customer Selected
+              </h2>
+              <div class="subject-meta" id="dossier-customer-meta">
+                Select an account from the book to inspect
               </div>
             </div>
+            <button
+              class="dossier-close-btn"
+              id="dossier-close-btn"
+              onclick="closeDossier()"
+              aria-label="Close Dossier"
+            >
+              ✕
+            </button>
           </div>
 
-          <!-- Cash Flow Stress Table (When user asks "What if customer doesn't pay?") -->
-          <div class="cash-flow-box hidden" id="cash-flow-box">
-            <div class="section-title">WORKING CAPITAL IMPACT</div>
-            <table class="ledger-table cf-table">
-              <thead>
-                <tr>
-                  <th scope="col">Metric</th>
-                  <th scope="col" class="num-col">Current</th>
-                  <th scope="col" class="num-col">With Order</th>
-                  <th scope="col" class="num-col">Default Impact</th>
-                </tr>
-              </thead>
-              <tbody id="cash-flow-tbody">
-                <!-- Dynamically filled -->
-              </tbody>
-            </table>
+          <!-- 3a. TRACE BAR (100% Honest Cypher Traceability Computation) -->
+          <div
+            class="dossier-trace-bar"
+            id="dossier-trace-bar"
+            aria-live="polite"
+          >
+            <span class="trace-icon">✓</span>
+            <span class="trace-text" id="trace-bar-text"
+              >All claims verified by graph traversal</span
+            >
           </div>
 
-          <!-- 3c. RATIONALE (Plain text with superscript evidence markers e1, e2...) -->
-          <div class="dossier-section">
-            <h3 class="section-title">RATIONALE</h3>
-            <div class="rationale-prose" id="rationale-prose">
-              Select an account from the book or type a question to inspect the graph evidence trail.
-            </div>
-          </div>
-
-          <!-- 3d. CONDITIONS (Numbered covenants) -->
-          <div class="dossier-section" id="conditions-section">
-            <h3 class="section-title">COVENANTS &amp; CONDITIONS</h3>
-            <ol class="covenants-list" id="covenants-list">
-              <li class="covenant-placeholder">Standard commercial terms apply.</li>
-            </ol>
-          </div>
-
-          <!-- 3e. EVIDENCE (Ruled ledger tables with underlined tabs) -->
-          <div class="dossier-section">
-            <h3 class="section-title">EVIDENCE TRAIL</h3>
-            <div class="evidence-tabs" role="tablist">
-              <button class="ev-tab-btn active" id="ev-tab-btn-profile" onclick="switchEvidenceTab('profile')">Profile</button>
-              <button class="ev-tab-btn" id="ev-tab-btn-invoices" onclick="switchEvidenceTab('invoices')">Invoices &amp; Payments</button>
-              <button class="ev-tab-btn" id="ev-tab-btn-disputes" onclick="switchEvidenceTab('disputes')">Disputes</button>
-              <button class="ev-tab-btn" id="ev-tab-btn-contacts" onclick="switchEvidenceTab('contacts')">Connected Network</button>
-              <button class="ev-tab-btn" id="ev-tab-btn-suppliers" onclick="switchEvidenceTab('suppliers')">Suppliers</button>
-            </div>
-
-            <!-- Evidence Pane: Profile -->
-            <div class="ev-pane" id="ev-pane-profile">
-              <div class="profile-metric-grid">
-                <div class="profile-card">
-                  <span class="card-label">CREDIT LIMIT</span>
-                  <span class="card-val font-mono" id="prof-credit-limit">₦0</span>
+          <div class="dossier-scroll-area">
+            <!-- 3b. THE VERDICT (Rubber-stamp typography & confidence gauge) -->
+            <div class="dossier-verdict-section" id="dossier-verdict-section">
+              <div class="verdict-row">
+                <div class="verdict-stamp-wrap">
+                  <span class="verdict-stamp stamp-neutral" id="verdict-stamp"
+                    >READY</span
+                  >
                 </div>
-                <div class="profile-card">
-                  <span class="card-label">OUTSTANDING</span>
-                  <span class="card-val font-mono" id="prof-outstanding">₦0</span>
+                <div class="verdict-confidence-block">
+                  <div class="confidence-label-row">
+                    <span class="confidence-label">CONFIDENCE</span>
+                    <span
+                      class="confidence-val font-mono"
+                      id="verdict-confidence-num"
+                      >--%</span
+                    >
+                  </div>
+                  <div class="confidence-bar-track">
+                    <div
+                      class="confidence-bar-fill"
+                      id="confidence-bar-fill"
+                      style="width: 0%"
+                    ></div>
+                  </div>
+                  <div class="risk-score-sub font-mono" id="verdict-risk-score">
+                    Score: --/100
+                  </div>
                 </div>
-                <div class="profile-card">
-                  <span class="card-label">OVERDUE</span>
-                  <span class="card-val font-mono vermilion" id="prof-overdue">₦0</span>
-                </div>
-                <div class="profile-card">
-                  <span class="card-label">TOTAL SETTLED</span>
-                  <span class="card-val font-mono green" id="prof-settled">₦0</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Evidence Pane: Invoices -->
-            <div class="ev-pane hidden" id="ev-pane-invoices">
-              <div class="table-wrap">
-                <table class="ledger-table" id="invoices-table">
-                  <thead>
-                    <tr>
-                      <th scope="col">Invoice</th>
-                      <th scope="col" class="num-col">Amount</th>
-                      <th scope="col">Due Date</th>
-                      <th scope="col">Status</th>
-                      <th scope="col" class="num-col">Paid</th>
-                      <th scope="col">Overdue</th>
-                    </tr>
-                  </thead>
-                  <tbody id="invoices-tbody">
-                    <tr><td colspan="6" class="empty-cell">No invoice records found.</td></tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <!-- Evidence Pane: Disputes -->
-            <div class="ev-pane hidden" id="ev-pane-disputes">
-              <div class="table-wrap">
-                <table class="ledger-table" id="disputes-table">
-                  <thead>
-                    <tr>
-                      <th scope="col">Invoice</th>
-                      <th scope="col">Dispute Reason</th>
-                      <th scope="col">Severity</th>
-                      <th scope="col">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody id="disputes-tbody">
-                    <tr><td colspan="4" class="empty-cell">No open disputes registered.</td></tr>
-                  </tbody>
-                </table>
               </div>
             </div>
 
-            <!-- Evidence Pane: Connected Contacts -->
-            <div class="ev-pane hidden" id="ev-pane-contacts">
-              <div class="connected-risk-summary" id="connected-risk-summary">
+            <!-- Cash Flow Stress Table (When user asks "What if customer doesn't pay?") -->
+            <div class="cash-flow-box hidden" id="cash-flow-box">
+              <div class="section-title">WORKING CAPITAL IMPACT</div>
+              <table class="ledger-table cf-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Metric</th>
+                    <th scope="col" class="num-col">Current</th>
+                    <th scope="col" class="num-col">With Order</th>
+                    <th scope="col" class="num-col">Default Impact</th>
+                  </tr>
+                </thead>
+                <tbody id="cash-flow-tbody">
+                  <!-- Dynamically filled -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- 3c. RATIONALE (Plain text with superscript evidence markers e1, e2...) -->
+            <div class="dossier-section">
+              <h3 class="section-title">RATIONALE</h3>
+              <div class="rationale-prose" id="rationale-prose">
+                Select an account from the book or type a question to inspect
+                the graph evidence trail.
+              </div>
+            </div>
+
+            <!-- 3d. CONDITIONS (Numbered covenants) -->
+            <div class="dossier-section" id="conditions-section">
+              <h3 class="section-title">COVENANTS &amp; CONDITIONS</h3>
+              <ol class="covenants-list" id="covenants-list">
+                <li class="covenant-placeholder">
+                  Standard commercial terms apply.
+                </li>
+              </ol>
+            </div>
+
+            <!-- 3e. EVIDENCE (Ruled ledger tables with underlined tabs) -->
+            <div class="dossier-section">
+              <h3 class="section-title">EVIDENCE TRAIL</h3>
+              <div class="evidence-tabs" role="tablist">
+                <button
+                  class="ev-tab-btn active"
+                  id="ev-tab-btn-profile"
+                  onclick="switchEvidenceTab('profile')"
+                >
+                  Profile
+                </button>
+                <button
+                  class="ev-tab-btn"
+                  id="ev-tab-btn-invoices"
+                  onclick="switchEvidenceTab('invoices')"
+                >
+                  Invoices &amp; Payments
+                </button>
+                <button
+                  class="ev-tab-btn"
+                  id="ev-tab-btn-disputes"
+                  onclick="switchEvidenceTab('disputes')"
+                >
+                  Disputes
+                </button>
+                <button
+                  class="ev-tab-btn"
+                  id="ev-tab-btn-contacts"
+                  onclick="switchEvidenceTab('contacts')"
+                >
+                  Connected Network
+                </button>
+                <button
+                  class="ev-tab-btn"
+                  id="ev-tab-btn-suppliers"
+                  onclick="switchEvidenceTab('suppliers')"
+                >
+                  Suppliers
+                </button>
+              </div>
+
+              <!-- Evidence Pane: Profile -->
+              <div class="ev-pane" id="ev-pane-profile">
+                <div class="profile-metric-grid">
+                  <div class="profile-card">
+                    <span class="card-label">CREDIT LIMIT</span>
+                    <span class="card-val font-mono" id="prof-credit-limit"
+                      >₦0</span
+                    >
+                  </div>
+                  <div class="profile-card">
+                    <span class="card-label">OUTSTANDING</span>
+                    <span class="card-val font-mono" id="prof-outstanding"
+                      >₦0</span
+                    >
+                  </div>
+                  <div class="profile-card">
+                    <span class="card-label">OVERDUE</span>
+                    <span class="card-val font-mono vermilion" id="prof-overdue"
+                      >₦0</span
+                    >
+                  </div>
+                  <div class="profile-card">
+                    <span class="card-label">TOTAL SETTLED</span>
+                    <span class="card-val font-mono green" id="prof-settled"
+                      >₦0</span
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <!-- Evidence Pane: Invoices -->
+              <div class="ev-pane hidden" id="ev-pane-invoices">
                 <div class="table-wrap">
-                  <table class="ledger-table" id="connected-table">
+                  <table class="ledger-table" id="invoices-table">
                     <thead>
                       <tr>
-                        <th scope="col">Connected Entity</th>
-                        <th scope="col">Shared Link</th>
-                        <th scope="col">Risk Score</th>
-                        <th scope="col" class="num-col">Overdue Debt</th>
+                        <th scope="col">Invoice</th>
+                        <th scope="col" class="num-col">Amount</th>
+                        <th scope="col">Due Date</th>
+                        <th scope="col">Status</th>
+                        <th scope="col" class="num-col">Paid</th>
+                        <th scope="col">Overdue</th>
                       </tr>
                     </thead>
-                    <tbody id="connected-tbody">
-                      <tr><td colspan="4" class="empty-cell">No contact-sharing contagion detected.</td></tr>
+                    <tbody id="invoices-tbody">
+                      <tr>
+                        <td colspan="6" class="empty-cell">
+                          No invoice records found.
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Evidence Pane: Disputes -->
+              <div class="ev-pane hidden" id="ev-pane-disputes">
+                <div class="table-wrap">
+                  <table class="ledger-table" id="disputes-table">
+                    <thead>
+                      <tr>
+                        <th scope="col">Invoice</th>
+                        <th scope="col">Dispute Reason</th>
+                        <th scope="col">Severity</th>
+                        <th scope="col">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody id="disputes-tbody">
+                      <tr>
+                        <td colspan="4" class="empty-cell">
+                          No open disputes registered.
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Evidence Pane: Connected Contacts -->
+              <div class="ev-pane hidden" id="ev-pane-contacts">
+                <div class="connected-risk-summary" id="connected-risk-summary">
+                  <div class="table-wrap">
+                    <table class="ledger-table" id="connected-table">
+                      <thead>
+                        <tr>
+                          <th scope="col">Connected Entity</th>
+                          <th scope="col">Shared Link</th>
+                          <th scope="col">Risk Score</th>
+                          <th scope="col" class="num-col">Overdue Debt</th>
+                        </tr>
+                      </thead>
+                      <tbody id="connected-tbody">
+                        <tr>
+                          <td colspan="4" class="empty-cell">
+                            No contact-sharing contagion detected.
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Evidence Pane: Suppliers -->
+              <div class="ev-pane hidden" id="ev-pane-suppliers">
+                <div class="table-wrap">
+                  <table class="ledger-table" id="suppliers-table">
+                    <thead>
+                      <tr>
+                        <th scope="col">Supplier</th>
+                        <th scope="col">Product</th>
+                        <th scope="col">Category</th>
+                        <th scope="col" class="num-col">Lead Time</th>
+                        <th scope="col" class="num-col">Stock</th>
+                      </tr>
+                    </thead>
+                    <tbody id="suppliers-tbody">
+                      <tr>
+                        <td colspan="5" class="empty-cell">
+                          No supplier records found.
+                        </td>
+                      </tr>
                     </tbody>
                   </table>
                 </div>
               </div>
             </div>
 
-            <!-- Evidence Pane: Suppliers -->
-            <div class="ev-pane hidden" id="ev-pane-suppliers">
-              <div class="table-wrap">
-                <table class="ledger-table" id="suppliers-table">
-                  <thead>
-                    <tr>
-                      <th scope="col">Supplier</th>
-                      <th scope="col">Product</th>
-                      <th scope="col">Category</th>
-                      <th scope="col" class="num-col">Lead Time</th>
-                      <th scope="col" class="num-col">Stock</th>
-                    </tr>
-                  </thead>
-                  <tbody id="suppliers-tbody">
-                    <tr><td colspan="5" class="empty-cell">No supplier records found.</td></tr>
-                  </tbody>
-                </table>
+            <!-- 3f. QUERIES (Real Cypher executed with syntax highlighting) -->
+            <div class="dossier-section">
+              <div class="section-title-row">
+                <h3 class="section-title">CYPHER AUDIT TRAIL</h3>
+                <span class="queries-count font-mono" id="cypher-queries-count"
+                  >0 queries</span
+                >
+              </div>
+              <div class="cypher-strip-list" id="cypher-strip-list">
+                <div class="cypher-empty-note">
+                  Execute an inquiry to review live Cypher queries.
+                </div>
+              </div>
+            </div>
+
+            <!-- 3g. AGENT ACTIONS & AUTONOMY -->
+            <div class="dossier-section">
+              <h3 class="section-title">AGENT ACTIONS &amp; AUTHORITY</h3>
+              <div class="action-status-box" id="action-status-box">
+                <div class="action-proposal-row">
+                  <span class="action-type-tag" id="action-type-tag"
+                    >DECISION</span
+                  >
+                  <span class="action-summary-text" id="action-summary-text"
+                    >Awaiting inquiry to formulate next steps.</span
+                  >
+                </div>
+                <div class="action-buttons-row">
+                  <button
+                    class="action-btn primary-action-btn"
+                    id="btn-approve-rec"
+                    onclick="executeApproveAction()"
+                  >
+                    Approve recommendation
+                  </button>
+                  <button
+                    class="action-btn"
+                    id="btn-override-open"
+                    onclick="toggleOverrideInline()"
+                  >
+                    Override
+                  </button>
+                  <button
+                    class="action-btn"
+                    id="btn-task-open"
+                    onclick="openModal('modal-task')"
+                  >
+                    Create follow-up task
+                  </button>
+                  <button
+                    class="action-btn"
+                    id="btn-reminder-open"
+                    onclick="openPaymentReminderSheet()"
+                  >
+                    Draft payment reminder
+                  </button>
+                </div>
+
+                <!-- Inline Override Input Area -->
+                <div
+                  class="override-inline-box hidden"
+                  id="override-inline-box"
+                >
+                  <div class="override-field-row">
+                    <label for="override-select">Override verdict:</label>
+                    <select id="override-select" class="ledger-input">
+                      <option value="APPROVE">APPROVE</option>
+                      <option value="APPROVE WITH CONDITIONS">
+                        APPROVE WITH CONDITIONS
+                      </option>
+                      <option value="HOLD">HOLD</option>
+                      <option value="ESCALATE">ESCALATE</option>
+                      <option value="CHASE PAYMENT">CHASE PAYMENT</option>
+                    </select>
+                  </div>
+                  <div class="override-field-row">
+                    <label for="override-reason-input">Owner rationale:</label>
+                    <input
+                      type="text"
+                      id="override-reason-input"
+                      class="ledger-input"
+                      placeholder="e.g. Director offered bank guarantee"
+                    />
+                  </div>
+                  <div class="override-actions-row">
+                    <button
+                      class="action-btn primary-action-btn"
+                      onclick="submitDecisionOverride()"
+                    >
+                      Save Override
+                    </button>
+                    <button class="action-btn" onclick="toggleOverrideInline()">
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Inline Action Confirmation -->
+                <div
+                  class="action-confirm-line hidden"
+                  id="action-confirm-line"
+                  aria-live="polite"
+                ></div>
+
+                <!-- Autonomy Boundary Notice -->
+                <div class="autonomy-policy-note">
+                  <div class="autonomy-toggle-row">
+                    <span class="autonomy-label">Autonomy Mode:</span>
+                    <span class="autonomy-choice"
+                      >Suggest only | Act with my approval</span
+                    >
+                  </div>
+                  <p class="autonomy-explanation">
+                    The agent never sends or commits anything outward without
+                    approval.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3h. JOURNAL (Historical Decisions & Handwriting-adjacent Memories) -->
+            <div class="dossier-section">
+              <div class="section-title-row">
+                <h3 class="section-title">JOURNAL &amp; MEMORIES</h3>
+                <button
+                  class="sub-action-link"
+                  onclick="openModal('modal-memory')"
+                >
+                  + Add memory
+                </button>
+              </div>
+
+              <!-- Long-term Memories as Margin Notes -->
+              <div class="memories-container" id="memories-container">
+                <!-- Dynamically populated -->
+              </div>
+
+              <!-- Historical Decisions Timeline -->
+              <div class="timeline-container" id="timeline-container">
+                <div class="timeline-empty">
+                  No decisions saved for this customer yet.
+                </div>
               </div>
             </div>
           </div>
+        </aside>
+      </div>
+    </div>
 
-          <!-- 3f. QUERIES (Real Cypher executed with syntax highlighting) -->
-          <div class="dossier-section">
-            <div class="section-title-row">
-              <h3 class="section-title">CYPHER AUDIT TRAIL</h3>
-              <span class="queries-count font-mono" id="cypher-queries-count">0 queries</span>
-            </div>
-            <div class="cypher-strip-list" id="cypher-strip-list">
-              <div class="cypher-empty-note">Execute an inquiry to review live Cypher queries.</div>
-            </div>
+    <!-- MODAL: Follow-up Task Sheet -->
+    <div
+      class="modal-backdrop hidden"
+      id="modal-task"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-task-title"
+    >
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3 class="modal-title" id="modal-task-title">
+            Create Follow-Up Task
+          </h3>
+          <button class="modal-close-btn" onclick="closeModal('modal-task')">
+            ✕
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-row">
+            <label for="task-title-input">Task Title:</label>
+            <input
+              type="text"
+              id="task-title-input"
+              class="ledger-input"
+              placeholder="e.g. Inspect warehouse waybills before order release"
+            />
           </div>
-
-          <!-- 3g. AGENT ACTIONS & AUTONOMY -->
-          <div class="dossier-section">
-            <h3 class="section-title">AGENT ACTIONS &amp; AUTHORITY</h3>
-            <div class="action-status-box" id="action-status-box">
-              <div class="action-proposal-row">
-                <span class="action-type-tag" id="action-type-tag">DECISION</span>
-                <span class="action-summary-text" id="action-summary-text">Awaiting inquiry to formulate next steps.</span>
-              </div>
-              <div class="action-buttons-row">
-                <button class="action-btn primary-action-btn" id="btn-approve-rec" onclick="executeApproveAction()">Approve recommendation</button>
-                <button class="action-btn" id="btn-override-open" onclick="toggleOverrideInline()">Override</button>
-                <button class="action-btn" id="btn-task-open" onclick="openModal('modal-task')">Create follow-up task</button>
-                <button class="action-btn" id="btn-reminder-open" onclick="openPaymentReminderSheet()">Draft payment reminder</button>
-              </div>
-
-              <!-- Inline Override Input Area -->
-              <div class="override-inline-box hidden" id="override-inline-box">
-                <div class="override-field-row">
-                  <label for="override-select">Override verdict:</label>
-                  <select id="override-select" class="ledger-input">
-                    <option value="APPROVE">APPROVE</option>
-                    <option value="APPROVE WITH CONDITIONS">APPROVE WITH CONDITIONS</option>
-                    <option value="HOLD">HOLD</option>
-                    <option value="ESCALATE">ESCALATE</option>
-                    <option value="CHASE PAYMENT">CHASE PAYMENT</option>
-                  </select>
-                </div>
-                <div class="override-field-row">
-                  <label for="override-reason-input">Owner rationale:</label>
-                  <input type="text" id="override-reason-input" class="ledger-input" placeholder="e.g. Director offered bank guarantee">
-                </div>
-                <div class="override-actions-row">
-                  <button class="action-btn primary-action-btn" onclick="submitDecisionOverride()">Save Override</button>
-                  <button class="action-btn" onclick="toggleOverrideInline()">Cancel</button>
-                </div>
-              </div>
-
-              <!-- Inline Action Confirmation -->
-              <div class="action-confirm-line hidden" id="action-confirm-line" aria-live="polite"></div>
-
-              <!-- Autonomy Boundary Notice -->
-              <div class="autonomy-policy-note">
-                <div class="autonomy-toggle-row">
-                  <span class="autonomy-label">Autonomy Mode:</span>
-                  <span class="autonomy-choice">Suggest only | Act with my approval</span>
-                </div>
-                <p class="autonomy-explanation">The agent never sends or commits anything outward without approval.</p>
-              </div>
-            </div>
+          <div class="form-row">
+            <label for="task-desc-input">Description:</label>
+            <textarea
+              id="task-desc-input"
+              rows="3"
+              class="ledger-input"
+              placeholder="Terms discussed with managing director"
+            ></textarea>
           </div>
-
-          <!-- 3h. JOURNAL (Historical Decisions & Handwriting-adjacent Memories) -->
-          <div class="dossier-section">
-            <div class="section-title-row">
-              <h3 class="section-title">JOURNAL &amp; MEMORIES</h3>
-              <button class="sub-action-link" onclick="openModal('modal-memory')">+ Add memory</button>
-            </div>
-            
-            <!-- Long-term Memories as Margin Notes -->
-            <div class="memories-container" id="memories-container">
-              <!-- Dynamically populated -->
-            </div>
-
-            <!-- Historical Decisions Timeline -->
-            <div class="timeline-container" id="timeline-container">
-              <div class="timeline-empty">No decisions saved for this customer yet.</div>
-            </div>
+          <div class="form-row">
+            <label for="task-due-input">Due Date:</label>
+            <input type="date" id="task-due-input" class="ledger-input" />
           </div>
-
         </div>
-      </aside>
-
-    </div>
-  </div>
-
-  <!-- MODAL: Follow-up Task Sheet -->
-  <div class="modal-backdrop hidden" id="modal-task" role="dialog" aria-modal="true" aria-labelledby="modal-task-title">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h3 class="modal-title" id="modal-task-title">Create Follow-Up Task</h3>
-        <button class="modal-close-btn" onclick="closeModal('modal-task')">✕</button>
-      </div>
-      <div class="modal-body">
-        <div class="form-row">
-          <label for="task-title-input">Task Title:</label>
-          <input type="text" id="task-title-input" class="ledger-input" placeholder="e.g. Inspect warehouse waybills before order release">
+        <div class="modal-footer">
+          <button class="action-btn" onclick="closeModal('modal-task')">
+            Cancel
+          </button>
+          <button
+            class="action-btn primary-action-btn"
+            onclick="submitNewTask()"
+          >
+            Save Task
+          </button>
         </div>
-        <div class="form-row">
-          <label for="task-desc-input">Description:</label>
-          <textarea id="task-desc-input" rows="3" class="ledger-input" placeholder="Terms discussed with managing director"></textarea>
-        </div>
-        <div class="form-row">
-          <label for="task-due-input">Due Date:</label>
-          <input type="date" id="task-due-input" class="ledger-input">
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="action-btn" onclick="closeModal('modal-task')">Cancel</button>
-        <button class="action-btn primary-action-btn" onclick="submitNewTask()">Save Task</button>
       </div>
     </div>
-  </div>
 
-  <!-- MODAL: Payment Reminder Note Sheet (Paper Note with Copy) -->
-  <div class="modal-backdrop hidden" id="modal-reminder" role="dialog" aria-modal="true" aria-labelledby="modal-reminder-title">
-    <div class="modal-card paper-sheet">
-      <div class="modal-header">
-        <h3 class="modal-title" id="modal-reminder-title">Draft Payment Reminder</h3>
-        <button class="modal-close-btn" onclick="closeModal('modal-reminder')">✕</button>
-      </div>
-      <div class="modal-body">
-        <div class="form-row">
-          <label for="reminder-contact-input">Recipient Contact:</label>
-          <input type="text" id="reminder-contact-input" class="ledger-input font-mono" placeholder="+234...">
+    <!-- MODAL: Payment Reminder Note Sheet (Paper Note with Copy) -->
+    <div
+      class="modal-backdrop hidden"
+      id="modal-reminder"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-reminder-title"
+    >
+      <div class="modal-card paper-sheet">
+        <div class="modal-header">
+          <h3 class="modal-title" id="modal-reminder-title">
+            Draft Payment Reminder
+          </h3>
+          <button
+            class="modal-close-btn"
+            onclick="closeModal('modal-reminder')"
+          >
+            ✕
+          </button>
         </div>
-        <div class="form-row">
-          <label for="reminder-text-area">Message Text (editable):</label>
-          <textarea id="reminder-text-area" rows="8" class="ledger-input font-mono paper-textarea"></textarea>
+        <div class="modal-body">
+          <div class="form-row">
+            <label for="reminder-contact-input">Recipient Contact:</label>
+            <input
+              type="text"
+              id="reminder-contact-input"
+              class="ledger-input font-mono"
+              placeholder="+234..."
+            />
+          </div>
+          <div class="form-row">
+            <label for="reminder-text-area">Message Text (editable):</label>
+            <textarea
+              id="reminder-text-area"
+              rows="8"
+              class="ledger-input font-mono paper-textarea"
+            ></textarea>
+          </div>
         </div>
-      </div>
-      <div class="modal-footer">
-        <span class="inline-note" id="reminder-copy-feedback">Ready to dispatch via WhatsApp or SMS.</span>
-        <button class="action-btn" onclick="closeModal('modal-reminder')">Close</button>
-        <button class="action-btn primary-action-btn" id="btn-copy-reminder" onclick="copyReminderText()">Copy Reminder</button>
+        <div class="modal-footer">
+          <span class="inline-note" id="reminder-copy-feedback"
+            >Ready to dispatch via WhatsApp or SMS.</span
+          >
+          <button class="action-btn" onclick="closeModal('modal-reminder')">
+            Close
+          </button>
+          <button
+            class="action-btn primary-action-btn"
+            id="btn-copy-reminder"
+            onclick="copyReminderText()"
+          >
+            Copy Reminder
+          </button>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- MODAL: Add Graph Memory Sheet -->
-  <div class="modal-backdrop hidden" id="modal-memory" role="dialog" aria-modal="true" aria-labelledby="modal-memory-title">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h3 class="modal-title" id="modal-memory-title">Record Graph Memory</h3>
-        <button class="modal-close-btn" onclick="closeModal('modal-memory')">✕</button>
-      </div>
-      <div class="modal-body">
-        <div class="form-row">
-          <label for="memory-type-select">Memory Type:</label>
-          <select id="memory-type-select" class="ledger-input">
-            <option value="POLICY">POLICY (Credit rules &amp; caps)</option>
-            <option value="PREFERENCE">PREFERENCE (Bank wire only, preferred contact)</option>
-            <option value="FACT">FACT (Warehouse location, director names)</option>
-            <option value="OUTCOME">OUTCOME (Past payment resolution)</option>
-          </select>
+    <!-- MODAL: Add Graph Memory Sheet -->
+    <div
+      class="modal-backdrop hidden"
+      id="modal-memory"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-memory-title"
+    >
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3 class="modal-title" id="modal-memory-title">
+            Record Graph Memory
+          </h3>
+          <button class="modal-close-btn" onclick="closeModal('modal-memory')">
+            ✕
+          </button>
         </div>
-        <div class="form-row">
-          <label for="memory-content-input">Memory Content:</label>
-          <textarea id="memory-content-input" rows="3" class="ledger-input" placeholder="e.g. Never release building materials on credit without cleared bank draft."></textarea>
+        <div class="modal-body">
+          <div class="form-row">
+            <label for="memory-type-select">Memory Type:</label>
+            <select id="memory-type-select" class="ledger-input">
+              <option value="POLICY">POLICY (Credit rules &amp; caps)</option>
+              <option value="PREFERENCE">
+                PREFERENCE (Bank wire only, preferred contact)
+              </option>
+              <option value="FACT">
+                FACT (Warehouse location, director names)
+              </option>
+              <option value="OUTCOME">OUTCOME (Past payment resolution)</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label for="memory-content-input">Memory Content:</label>
+            <textarea
+              id="memory-content-input"
+              rows="3"
+              class="ledger-input"
+              placeholder="e.g. Never release building materials on credit without cleared bank draft."
+            ></textarea>
+          </div>
+          <div class="form-row">
+            <label for="memory-importance-input">Importance (1 to 10):</label>
+            <input
+              type="number"
+              id="memory-importance-input"
+              class="ledger-input"
+              min="1"
+              max="10"
+              value="8"
+            />
+          </div>
         </div>
-        <div class="form-row">
-          <label for="memory-importance-input">Importance (1 to 10):</label>
-          <input type="number" id="memory-importance-input" class="ledger-input" min="1" max="10" value="8">
+        <div class="modal-footer">
+          <button class="action-btn" onclick="closeModal('modal-memory')">
+            Cancel
+          </button>
+          <button
+            class="action-btn primary-action-btn"
+            onclick="submitNewMemory()"
+          >
+            Save Memory
+          </button>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button class="action-btn" onclick="closeModal('modal-memory')">Cancel</button>
-        <button class="action-btn primary-action-btn" onclick="submitNewMemory()">Save Memory</button>
       </div>
     </div>
-  </div>
 
-  <!-- MODAL: Upload CSV Sheet -->
-  <div class="modal-backdrop hidden" id="modal-upload" role="dialog" aria-modal="true" aria-labelledby="modal-upload-title">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h3 class="modal-title" id="modal-upload-title">Upload Dataset CSV</h3>
-        <button class="modal-close-btn" onclick="closeModal('modal-upload')">✕</button>
-      </div>
-      <div class="modal-body">
-        <p class="modal-instruction">Select any verified table (<code>customers.csv</code>, <code>orders.csv</code>, <code>invoices.csv</code>, <code>payments.csv</code>, <code>disputes.csv</code>, <code>suppliers.csv</code>, or <code>products.csv</code>) to ingest directly into FalkorDB.</p>
-        <div class="form-row">
-          <input type="file" id="csv-file-picker" accept=".csv" class="ledger-input file-input">
+    <!-- MODAL: Upload CSV Sheet -->
+    <div
+      class="modal-backdrop hidden"
+      id="modal-upload"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-upload-title"
+    >
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3 class="modal-title" id="modal-upload-title">
+            Upload Dataset CSV
+          </h3>
+          <button class="modal-close-btn" onclick="closeModal('modal-upload')">
+            ✕
+          </button>
         </div>
-        <div class="upload-progress-row hidden" id="upload-progress-row">
-          <span class="progress-spinner"></span>
-          <span>Uploading and re-indexing FalkorDB...</span>
+        <div class="modal-body">
+          <p class="modal-instruction">
+            Select any verified table (<code>customers.csv</code>,
+            <code>orders.csv</code>, <code>invoices.csv</code>,
+            <code>payments.csv</code>, <code>disputes.csv</code>,
+            <code>suppliers.csv</code>, or <code>products.csv</code>) to ingest
+            directly into FalkorDB.
+          </p>
+          <div class="form-row">
+            <input
+              type="file"
+              id="csv-file-picker"
+              accept=".csv"
+              class="ledger-input file-input"
+            />
+          </div>
+          <div class="upload-progress-row hidden" id="upload-progress-row">
+            <span class="progress-spinner"></span>
+            <span>Uploading and re-indexing FalkorDB...</span>
+          </div>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button class="action-btn" onclick="closeModal('modal-upload')">Cancel</button>
-        <button class="action-btn primary-action-btn" onclick="submitCsvUpload()">Upload &amp; Re-seed</button>
+        <div class="modal-footer">
+          <button class="action-btn" onclick="closeModal('modal-upload')">
+            Cancel
+          </button>
+          <button
+            class="action-btn primary-action-btn"
+            onclick="submitCsvUpload()"
+          >
+            Upload &amp; Re-seed
+          </button>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- Plain Vanilla JavaScript Application Controller -->
-  <script src="/static/app.js"></script>
-</body>
+    <!-- Plain Vanilla JavaScript Application Controller -->
+    <script src="/static/app.js"></script>
+  </body>
 </html>

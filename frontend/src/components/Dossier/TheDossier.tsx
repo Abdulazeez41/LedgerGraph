@@ -1,16 +1,17 @@
-import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useStore } from '@/store/useStore';
-import { panelSlideVariants } from '@/lib/motionTokens';
-import { TraceBar } from './TraceBar';
-import { VerdictStamp } from './VerdictStamp';
-import { RationaleView } from './RationaleView';
-import { CovenantsList } from './CovenantsList';
-import { FinancialGrid } from './FinancialGrid';
-import { CypherViewer } from './CypherViewer';
-import { HistoryTable } from './HistoryTable';
-import { DecisionsJournal } from './DecisionsJournal';
-import { DossierActions } from './DossierActions';
+import React from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useStore } from "@/store/useStore";
+import { panelSlideVariants } from "@/lib/motionTokens";
+import { TraceBar } from "./TraceBar";
+import { VerdictStamp } from "./VerdictStamp";
+import { RationaleView } from "./RationaleView";
+import { CovenantsList } from "./CovenantsList";
+import { FinancialGrid } from "./FinancialGrid";
+import { CypherViewer } from "./CypherViewer";
+import { HistoryTable } from "./HistoryTable";
+import { DecisionsJournal } from "./DecisionsJournal";
+import { DossierActions } from "./DossierActions";
+import { formatMoney } from "@/lib/format";
 import {
   X,
   Phone,
@@ -21,7 +22,7 @@ import {
   Terminal,
   History,
   Info,
-} from 'lucide-react';
+} from "lucide-react";
 
 export const TheDossier: React.FC = () => {
   const {
@@ -58,7 +59,7 @@ export const TheDossier: React.FC = () => {
                   Commercial Dossier
                 </span>
                 <span className="font-mono text-[10px] font-bold text-brass bg-brass-dim px-2 py-0.5 rounded border border-brass/30">
-                  ID: {profile?.customer_id || profile?.id || '—'}
+                  ID: {profile?.customer_id || profile?.id || "-"}
                 </span>
                 {profile?.business_type && (
                   <span className="font-mono text-[10px] text-ink-muted bg-black/5 px-2 py-0.5 rounded border border-black/10 truncate max-w-[220px]">
@@ -68,7 +69,7 @@ export const TheDossier: React.FC = () => {
               </div>
 
               <h2 className="font-display text-xl font-bold text-ink truncate mt-0.5">
-                {profile?.name || 'Customer Account'}
+                {profile?.name || "Customer Account"}
               </h2>
 
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5 text-[11px] font-mono text-ink-muted">
@@ -85,7 +86,10 @@ export const TheDossier: React.FC = () => {
                   </span>
                 )}
                 {profile?.address && (
-                  <span className="flex items-center space-x-1 truncate max-w-[220px] select-text" title={profile.address}>
+                  <span
+                    className="flex items-center space-x-1 truncate max-w-[220px] select-text"
+                    title={profile.address}
+                  >
                     <MapPin className="w-3 h-3 text-ink-subtle flex-shrink-0" />
                     <span className="truncate">{profile.address}</span>
                   </span>
@@ -107,15 +111,19 @@ export const TheDossier: React.FC = () => {
             <div className="px-4 py-2.5 bg-vermilion-dim border-b border-vermilion/30 flex items-start space-x-2 text-xs font-mono text-vermilion">
               <ShieldAlert className="w-4 h-4 flex-shrink-0 mt-0.5 text-vermilion" />
               <div className="min-w-0">
-                <span className="font-bold">COLLUSION / DELINQUENT RING DETECTED:</span>
+                <span className="font-bold">
+                  COLLUSION / DELINQUENT RING DETECTED:
+                </span>
                 <p className="text-[11px] text-ink font-sans mt-0.5">
-                  Connected to {connectedRisks.length} account(s) with shared contacts (
-                  {connectedRisks.map((cr) => cr.connected_customer).join(', ')}). Total ring overdue:{' '}
+                  Connected to {connectedRisks.length} account(s) with shared
+                  contacts (
+                  {connectedRisks.map((cr) => cr.connected_customer).join(", ")}
+                  ). Total ring overdue:{" "}
                   <span className="font-bold text-vermilion">
-                    ₦
-                    {connectedRisks
-                      .reduce((sum, cr) => sum + (cr.overdue_amount || 0), 0)
-                      .toLocaleString()}
+                    {formatMoney(
+                      connectedRisks.reduce((sum, cr) => sum + (cr.overdue_amount || 0), 0),
+                      true
+                    )}
                   </span>
                   .
                 </p>
@@ -142,11 +150,11 @@ export const TheDossier: React.FC = () => {
           {/* Dossier Navigation Tabs */}
           <div className="flex border-b border-black/10 bg-black/[0.02] px-3 pt-2 space-x-1 font-mono text-xs">
             <button
-              onClick={() => setActiveDossierTab('overview')}
+              onClick={() => setActiveDossierTab("overview")}
               className={`px-3 py-1.5 rounded-t-lg transition-all flex items-center space-x-1.5 border-b-2 ${
-                activeDossierTab === 'overview'
-                  ? 'border-ink text-ink font-bold bg-white/70 shadow-sm'
-                  : 'border-transparent text-ink-muted hover:text-ink'
+                activeDossierTab === "overview"
+                  ? "border-ink text-ink font-bold bg-white/70 shadow-sm"
+                  : "border-transparent text-ink-muted hover:text-ink"
               }`}
             >
               <Info className="w-3.5 h-3.5" />
@@ -154,11 +162,11 @@ export const TheDossier: React.FC = () => {
             </button>
 
             <button
-              onClick={() => setActiveDossierTab('history')}
+              onClick={() => setActiveDossierTab("history")}
               className={`px-3 py-1.5 rounded-t-lg transition-all flex items-center space-x-1.5 border-b-2 ${
-                activeDossierTab === 'history'
-                  ? 'border-ink text-ink font-bold bg-white/70 shadow-sm'
-                  : 'border-transparent text-ink-muted hover:text-ink'
+                activeDossierTab === "history"
+                  ? "border-ink text-ink font-bold bg-white/70 shadow-sm"
+                  : "border-transparent text-ink-muted hover:text-ink"
               }`}
             >
               <FileSpreadsheet className="w-3.5 h-3.5" />
@@ -166,23 +174,25 @@ export const TheDossier: React.FC = () => {
             </button>
 
             <button
-              onClick={() => setActiveDossierTab('cypher')}
+              onClick={() => setActiveDossierTab("cypher")}
               className={`px-3 py-1.5 rounded-t-lg transition-all flex items-center space-x-1.5 border-b-2 ${
-                activeDossierTab === 'cypher'
-                  ? 'border-ink text-ink font-bold bg-white/70 shadow-sm'
-                  : 'border-transparent text-ink-muted hover:text-ink'
+                activeDossierTab === "cypher"
+                  ? "border-ink text-ink font-bold bg-white/70 shadow-sm"
+                  : "border-transparent text-ink-muted hover:text-ink"
               }`}
             >
               <Terminal className="w-3.5 h-3.5" />
-              <span>Cypher ({lastChatResponse?.cypher_queries?.length || 0})</span>
+              <span>
+                Cypher ({lastChatResponse?.cypher_queries?.length || 0})
+              </span>
             </button>
 
             <button
-              onClick={() => setActiveDossierTab('journal')}
+              onClick={() => setActiveDossierTab("journal")}
               className={`px-3 py-1.5 rounded-t-lg transition-all flex items-center space-x-1.5 border-b-2 ${
-                activeDossierTab === 'journal'
-                  ? 'border-ink text-ink font-bold bg-white/70 shadow-sm'
-                  : 'border-transparent text-ink-muted hover:text-ink'
+                activeDossierTab === "journal"
+                  ? "border-ink text-ink font-bold bg-white/70 shadow-sm"
+                  : "border-transparent text-ink-muted hover:text-ink"
               }`}
             >
               <History className="w-3.5 h-3.5" />
@@ -196,7 +206,7 @@ export const TheDossier: React.FC = () => {
               <div className="p-12 text-center text-xs font-mono text-ink-muted">
                 Traversing account relationships in FalkorDB...
               </div>
-            ) : activeDossierTab === 'overview' ? (
+            ) : activeDossierTab === "overview" ? (
               <>
                 {lastChatResponse && (
                   <RationaleView
@@ -206,14 +216,16 @@ export const TheDossier: React.FC = () => {
                 )}
 
                 {lastChatResponse?.recommended_conditions && (
-                  <CovenantsList conditions={lastChatResponse.recommended_conditions} />
+                  <CovenantsList
+                    conditions={lastChatResponse.recommended_conditions}
+                  />
                 )}
 
                 <FinancialGrid profile={profile} />
               </>
-            ) : activeDossierTab === 'history' ? (
+            ) : activeDossierTab === "history" ? (
               <HistoryTable history={history} />
-            ) : activeDossierTab === 'cypher' ? (
+            ) : activeDossierTab === "cypher" ? (
               <CypherViewer queries={lastChatResponse?.cypher_queries || []} />
             ) : (
               <DecisionsJournal decisions={decisions} />

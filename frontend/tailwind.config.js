@@ -14,6 +14,8 @@ export default {
         ink: 'var(--color-ink)',
         chalk: 'var(--color-chalk)',
         muted: 'var(--color-muted)',
+        'dollar-green': 'var(--color-dollar-green)',
+        'dollar-green-dim': 'var(--color-dollar-green-dim)',
         'naira-green': 'var(--color-naira-green)',
         'naira-green-dim': 'var(--color-naira-green-dim)',
         brass: 'var(--color-brass)',

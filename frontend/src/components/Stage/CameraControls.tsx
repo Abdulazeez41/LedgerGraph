@@ -37,7 +37,7 @@ export const CameraControls: React.FC = () => {
         onClick={() => triggerCameraCommand('focus')}
         className={`flex items-center space-x-1.5 px-2.5 py-1 rounded-full transition-all ${
           viewMode === 'focused'
-            ? 'bg-naira-green text-chalk font-semibold shadow-sm'
+            ? 'bg-dollar-green text-chalk font-semibold shadow-sm'
             : 'text-chalk/80 hover:text-chalk hover:bg-white/10'
         }`}
         title="Center camera on prompted / evaluated customer"

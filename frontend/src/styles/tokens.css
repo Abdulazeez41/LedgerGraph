@@ -20,10 +20,15 @@
   --color-muted-dim: #44514b;
 
   /* Semantic Palettes (strictly no purple/violet) */
-  --color-naira-green: #1e7f55;
-  --color-naira-green-light: #2da36f;
-  --color-naira-green-dim: rgba(30, 127, 85, 0.14);
-  --color-naira-green-border: rgba(30, 127, 85, 0.35);
+  --color-dollar-green: #1e7f55;
+  --color-dollar-green-light: #2da36f;
+  --color-dollar-green-dim: rgba(30, 127, 85, 0.14);
+  --color-dollar-green-border: rgba(30, 127, 85, 0.35);
+
+  --color-dollar-green: var(--color-dollar-green);
+  --color-dollar-green-light: var(--color-dollar-green-light);
+  --color-dollar-green-dim: var(--color-dollar-green-dim);
+  --color-dollar-green-border: var(--color-dollar-green-border);
 
   --color-brass: #c69234;
   --color-brass-light: #dcab4a;

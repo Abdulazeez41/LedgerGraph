@@ -1,5 +1,5 @@
 /* ==========================================================================
-   LedgerGraph — "The Ledger Room" Design System
+   LedgerGraph - "The Ledger Room" Design System
    A working desk for a business owner: bound paper ledger + 3D relationship map.
    Palette: Ink Green-Black, Warm Bone Paper, Ruled Lines, Naira Green, Brass, Vermilion.
    Corners: Square (0-3px). Lines: Hairlines (1px). Type: Fraunces, Schibsted Grotesk, IBM Plex Mono.
@@ -11,44 +11,45 @@
    -------------------------------------------------------------------------- */
 :root {
   /* Stage (Graph & Dark Working Space) */
-  --stage: #0B1210;
-  --stage-surface: #0F1815;
-  --stage-card: #14201C;
-  --stage-rule: #1B2B26;
+  --stage: #0b1210;
+  --stage-surface: #0f1815;
+  --stage-card: #14201c;
+  --stage-rule: #1b2b26;
   --stage-rule-subtle: rgba(217, 212, 196, 0.08);
   --stage-grid: rgba(217, 212, 196, 0.025);
-  --chalk: #D9D4C4;
-  --chalk-muted: #8E8A7D;
-  --chalk-faint: #5F5C53;
+  --chalk: #d9d4c4;
+  --chalk-muted: #8e8a7d;
+  --chalk-faint: #5f5c53;
 
   /* Paper (Ledger Index & Credit Dossier) */
-  --paper: #EEE8DA;
-  --paper-elevated: #F4EFE4;
-  --paper-sheet: #F7F3EA;
-  --paper-rule: #CFC6B0;
-  --paper-rule-subtle: #E2DAC6;
-  --ink: #15120E;
-  --ink-secondary: #3D3830;
-  --ink-muted: #645D52;
-  --ink-faint: #988F80;
+  --paper: #eee8da;
+  --paper-elevated: #f4efe4;
+  --paper-sheet: #f7f3ea;
+  --paper-rule: #cfc6b0;
+  --paper-rule-subtle: #e2dac6;
+  --ink: #15120e;
+  --ink-secondary: #3d3830;
+  --ink-muted: #645d52;
+  --ink-faint: #988f80;
 
   /* Meaning-Only Accents */
-  --green: #2F7D55;                 /* Approve, Paid, Good standing */
+  --green: #2f7d55; /* Approve, Paid, Good standing */
   --green-tint: rgba(47, 125, 85, 0.12);
   --green-border: rgba(47, 125, 85, 0.45);
-  
-  --brass: #B8862B;                 /* Conditions, Caution, Accents */
+
+  --brass: #b8862b; /* Conditions, Caution, Accents */
   --brass-tint: rgba(184, 134, 43, 0.12);
   --brass-border: rgba(184, 134, 43, 0.45);
-  
-  --vermilion: #C8452B;             /* Hold, Escalate, Overdue, Delinquent */
+
+  --vermilion: #c8452b; /* Hold, Escalate, Overdue, Delinquent */
   --vermilion-tint: rgba(200, 69, 43, 0.12);
   --vermilion-border: rgba(200, 69, 43, 0.45);
 
   /* Typography */
-  --font-display: 'Fraunces', serif;
-  --font-body: 'Schibsted Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-mono: 'IBM Plex Mono', monospace;
+  --font-display: "Fraunces", serif;
+  --font-body:
+    "Schibsted Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: "IBM Plex Mono", monospace;
 
   /* Timing & Easing Curves */
   --ease-apple: cubic-bezier(0.16, 1, 0.3, 1);
@@ -61,13 +62,16 @@
 /* --------------------------------------------------------------------------
    2. Base Reset & Typography
    -------------------------------------------------------------------------- */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-html, body {
+html,
+body {
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -105,10 +109,18 @@ body::before {
   letter-spacing: -0.02em;
 }
 
-.vermilion { color: var(--vermilion) !important; }
-.brass { color: var(--brass) !important; }
-.green { color: var(--green) !important; }
-.hidden { display: none !important; }
+.vermilion {
+  color: var(--vermilion) !important;
+}
+.brass {
+  color: var(--brass) !important;
+}
+.green {
+  color: var(--green) !important;
+}
+.hidden {
+  display: none !important;
+}
 
 /* Focus Ring: 2px Brass Offset */
 :focus-visible {
@@ -151,7 +163,9 @@ body::before {
   overflow-x: auto;
   scrollbar-width: none;
 }
-.strip-left::-webkit-scrollbar { display: none; }
+.strip-left::-webkit-scrollbar {
+  display: none;
+}
 
 .strip-brand {
   display: flex;
@@ -296,7 +310,12 @@ body::before {
   position: relative;
   z-index: 20;
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.25);
-  background-image: repeating-linear-gradient(to bottom, transparent, transparent 29px, var(--paper-rule-subtle) 30px);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent,
+    transparent 29px,
+    var(--paper-rule-subtle) 30px
+  );
 }
 
 .the-book::before {
@@ -461,9 +480,15 @@ body::before {
   transition: width var(--dur-mid) var(--ease-apple);
 }
 
-.utilization-fill.good { background-color: var(--green); }
-.utilization-fill.mid { background-color: var(--brass); }
-.utilization-fill.high { background-color: var(--vermilion); }
+.utilization-fill.good {
+  background-color: var(--green);
+}
+.utilization-fill.mid {
+  background-color: var(--brass);
+}
+.utilization-fill.high {
+  background-color: var(--vermilion);
+}
 
 .row-badges-wrap {
   display: flex;
@@ -609,8 +634,14 @@ body::before {
   pointer-events: auto;
 }
 
-.stage-crumb-sep { margin: 0 4px; color: var(--chalk-faint); }
-.stage-crumb-current { color: var(--chalk); font-weight: 500; }
+.stage-crumb-sep {
+  margin: 0 4px;
+  color: var(--chalk-faint);
+}
+.stage-crumb-current {
+  color: var(--chalk);
+  font-weight: 500;
+}
 
 .stage-scope-toggle {
   display: flex;
@@ -633,9 +664,19 @@ body::before {
   transition: color var(--dur-fast);
 }
 
-.scope-btn:hover { color: var(--chalk); }
-.scope-btn.active { color: var(--chalk); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
-.scope-sep { color: var(--stage-rule); font-size: 10px; }
+.scope-btn:hover {
+  color: var(--chalk);
+}
+.scope-btn.active {
+  color: var(--chalk);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.scope-sep {
+  color: var(--stage-rule);
+  font-size: 10px;
+}
 
 /* 3D Canvas */
 .stage-canvas-wrap {
@@ -652,7 +693,9 @@ body::before {
   cursor: grab;
 }
 
-#webgl-canvas:active { cursor: grabbing; }
+#webgl-canvas:active {
+  cursor: grabbing;
+}
 
 .svg-fallback {
   position: absolute;
@@ -725,7 +768,9 @@ body::before {
 }
 
 @keyframes radar-spin {
-  100% { transform: rotate(360deg); }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .working-caption {
@@ -752,7 +797,9 @@ body::before {
   overflow-x: auto;
   scrollbar-width: none;
 }
-.stage-prompts-lozenge-row::-webkit-scrollbar { display: none; }
+.stage-prompts-lozenge-row::-webkit-scrollbar {
+  display: none;
+}
 
 .prompts-label {
   font-size: 10px;
@@ -796,8 +843,14 @@ body::before {
 }
 
 @keyframes fade-in-line {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .transcript-entry.user-line {
@@ -1169,7 +1222,8 @@ body::before {
   transition: all var(--dur-fast);
 }
 
-.evidence-marker:hover, .evidence-marker:focus {
+.evidence-marker:hover,
+.evidence-marker:focus {
   background-color: var(--brass-tint);
   outline: none;
 }
@@ -1203,7 +1257,9 @@ body::before {
   overflow-x: auto;
   scrollbar-width: none;
 }
-.evidence-tabs::-webkit-scrollbar { display: none; }
+.evidence-tabs::-webkit-scrollbar {
+  display: none;
+}
 
 .ev-tab-btn {
   background: transparent;
@@ -1305,9 +1361,15 @@ body::before {
 
 /* Brass underline flash on evidence marker link */
 @keyframes brass-row-flash {
-  0% { background-color: var(--brass-tint); }
-  50% { background-color: rgba(184, 134, 43, 0.25); }
-  100% { background-color: transparent; }
+  0% {
+    background-color: var(--brass-tint);
+  }
+  50% {
+    background-color: rgba(184, 134, 43, 0.25);
+  }
+  100% {
+    background-color: transparent;
+  }
 }
 
 .row-highlight-flash {
@@ -1389,10 +1451,19 @@ body::before {
 }
 
 /* Cypher Syntax Highlighting Classes */
-.c-keyword { color: var(--brass); font-weight: 600; }
-.c-label { color: var(--green); }
-.c-param { color: var(--chalk); }
-.c-string { color: var(--paper); }
+.c-keyword {
+  color: var(--brass);
+  font-weight: 600;
+}
+.c-label {
+  color: var(--green);
+}
+.c-param {
+  color: var(--chalk);
+}
+.c-string {
+  color: var(--paper);
+}
 
 .cypher-params-bar {
   padding: 4px 10px;
@@ -1457,7 +1528,7 @@ body::before {
 }
 
 .action-btn:hover {
-  background-color: #FFFFFF;
+  background-color: #ffffff;
   transform: translate(-1px, -1px);
   box-shadow: 2px 2px 0 var(--ink);
 }
@@ -1522,8 +1593,13 @@ body::before {
   font-size: 10px;
 }
 
-.autonomy-label { color: var(--ink-muted); }
-.autonomy-choice { color: var(--ink); font-weight: 600; }
+.autonomy-label {
+  color: var(--ink-muted);
+}
+.autonomy-choice {
+  color: var(--ink);
+  font-weight: 600;
+}
 
 .autonomy-explanation {
   font-size: 10px;
@@ -1751,8 +1827,12 @@ body::before {
    8. Mobile & Responsive Adaptation (< 900px)
    -------------------------------------------------------------------------- */
 @media (max-width: 900px) {
-  .strip-metrics { display: none; }
-  .mobile-toggle-btn { display: inline-block; }
+  .strip-metrics {
+    display: none;
+  }
+  .mobile-toggle-btn {
+    display: inline-block;
+  }
 
   .the-book {
     position: absolute;
@@ -1807,7 +1887,9 @@ body::before {
    9. Prefers-Reduced-Motion Override
    -------------------------------------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;

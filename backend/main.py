@@ -16,7 +16,7 @@ logger = logging.getLogger("ledgergraph")
 app = FastAPI(
     title=settings.PROJECT_NAME,
     version=settings.VERSION,
-    description="FalkorDB Graph-Grounded SME Credit & Cash-Flow Copilot for Nigerian SMEs"
+    description="FalkorDB Graph-Grounded SME Credit & Cash-Flow Copilot for Global Commercial Suppliers"
 )
 
 # CORS setup

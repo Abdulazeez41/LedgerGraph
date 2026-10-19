@@ -37,7 +37,7 @@ export const LedgerStrip: React.FC = () => {
         <div className="hidden lg:flex items-center space-x-2 px-2.5 py-1 rounded-full glass-pill text-xs font-mono">
           <span
             className={`w-2 h-2 rounded-full ${
-              isHealthy ? 'bg-naira-green shadow-[0_0_8px_rgba(30,127,85,0.8)]' : 'bg-vermilion animate-pulse'
+              isHealthy ? 'bg-dollar-green shadow-[0_0_8px_rgba(30,127,85,0.8)]' : 'bg-vermilion animate-pulse'
             }`}
           />
           <span className="text-chalk/90 font-medium">
@@ -63,7 +63,7 @@ export const LedgerStrip: React.FC = () => {
           <span className="text-[10px] uppercase tracking-wider text-muted">Overdue Exposure</span>
           <span
             className={`font-semibold text-sm ${
-              totalOverdue > 0 ? 'text-vermilion-light' : 'text-naira-green'
+              totalOverdue > 0 ? 'text-vermilion-light' : 'text-dollar-green'
             }`}
           >
             {formatCompactMoney(totalOverdue)}

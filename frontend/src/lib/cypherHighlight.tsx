@@ -174,7 +174,7 @@ export function tokenizeCypher(code: string): Token[] {
 
 const TOKEN_STYLES: Record<TokenType, string> = {
   keyword: 'text-brass font-semibold',
-  function: 'text-naira-green-light',
+  function: 'text-dollar-green-light',
   label: 'text-chalk font-medium bg-white/5 px-0.5 rounded',
   relation: 'text-brass-light font-bold',
   param: 'text-vermilion-light font-mono',

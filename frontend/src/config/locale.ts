@@ -13,9 +13,9 @@ export interface LocaleConfig {
 }
 
 export const APP_CONFIG: LocaleConfig = {
-  locale: 'en-NG',
-  currencyCode: 'NGN',
-  currencySymbol: '₦',
+  locale: 'en-US',
+  currencyCode: 'USD',
+  currencySymbol: '$',
   dateFormat: {
     day: 'numeric',
     month: 'short',
